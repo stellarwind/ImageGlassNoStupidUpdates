@@ -85,7 +85,6 @@ public static class AppCmds
     //public static string EXPORT_FRAMES => "--ig-export-frames";
     //public static string LOSSLESS_COMPRESS => "--ig-lossless-compress";
 
-    //public static string CHECK_FOR_UPDATE => "--ig-check-for-update";
     //public static string INSTALL_LANGUAGES => "--ig-install-languages";
     //public static string INSTALL_THEMES => "--ig-install-themes";
     //public static string UNINSTALL_THEME => "--ig-uninstall-theme";

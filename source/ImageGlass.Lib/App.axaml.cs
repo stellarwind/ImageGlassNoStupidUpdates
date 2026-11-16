@@ -48,7 +48,6 @@ namespace ImageGlass.Common;
 public partial class App : Application
 {
     private static MainWindow? _mainWindow = null;
-    private static Task _updateReconcileTask = Task.CompletedTask;
     private TaskCompletionSource _taskUi = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     /// <summary>
@@ -181,9 +180,6 @@ public partial class App : Application
 
             // an expired license leaves the app in Classic: say so and offer the ways out
             ShowExpiredLicenseNotice();
-
-            // an update that died mid-install would otherwise re-arm itself silently on every launch
-            _ = ReportFailedUpdateAsync();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -583,39 +579,8 @@ public partial class App : Application
         // initialize service providers
         Core.API = new AppAPIProvider();
 
-
-        // reconcile first and keep the task: the startup UI reports a failed install from it
-        _updateReconcileTask = Core.UpdateProvider.ReconcilePendingUpdateAsync();
-        _ = InitializeUpdateProviderAsync();
-
-        // an app update can invalidate the launch path baked into an existing registration
+        // Repair a stale launch path in an existing default-viewer registration.
         if (Core.ShellProvider is { } shell) _ = Task.Run(shell.RepairDefaultViewerRegistration);
-    }
-
-
-    /// <summary>
-    /// Fires the silent update check once the pending-update flag has been reconciled.
-    /// </summary>
-    private static async Task InitializeUpdateProviderAsync()
-    {
-        await _updateReconcileTask;
-
-        // silent check handles disabled/interval logic
-        _ = await Core.API.RunApiAsync(API.IG_CheckForUpdate, "false");
-    }
-
-
-    /// <summary>
-    /// Reports an install that Windows rejected after shutting the previous session down.
-    /// </summary>
-    private static async Task ReportFailedUpdateAsync()
-    {
-        await _updateReconcileTask;
-
-        if (Core.UpdateProvider.LastApplyFailure is { } failure)
-        {
-            await AppAPIProvider.ShowUpdateFailedAsync(failure);
-        }
     }
 
 

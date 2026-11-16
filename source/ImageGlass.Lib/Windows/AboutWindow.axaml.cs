@@ -21,7 +21,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using ImageGlass.Common.Localization;
-using ImageGlass.Common.ServiceProviders;
 using ImageGlass.Common.Types;
 using ImageGlass.UI;
 using ImageGlass.UI.Windowing;
@@ -112,11 +111,6 @@ public partial class AboutWindow : DialogWindow
         PART_BtnEula.Click += (_, _) => OpenUrl("https://imageglass.org/license");
         PART_BtnPrivacy.Click += (_, _) => OpenUrl("https://imageglass.org/privacy");
         PART_BtnDonate.Click += (_, _) => OpenUrl("https://imageglass.org/donate");
-
-        PART_BtnCheckForUpdate.Click += async (_, _) =>
-        {
-            _ = await Core.API.RunApiAsync(API.IG_CheckForUpdate, "true");
-        };
     }
 
 
@@ -156,7 +150,6 @@ public partial class AboutWindow : DialogWindow
         PART_BtnEula.Text = Core.Lang[LangId._License];
         PART_BtnPrivacy.Text = Core.Lang[LangId._Privacy];
         PART_BtnDonate.Text = "❤️ " + Core.Lang[LangId._Donate];
-        PART_BtnCheckForUpdate.Text = Core.Lang[LangId._CheckForUpdate];
 
         // the edition name is not translatable, but the tooltip says what clicking it does
         ToolTip.SetTip(PART_BtnEdition, Core.Lang[Core.IsProEnabled

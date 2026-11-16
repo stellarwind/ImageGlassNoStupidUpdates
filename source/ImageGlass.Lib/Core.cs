@@ -27,7 +27,6 @@ using ImageGlass.Common.Loggers;
 using ImageGlass.Common.Photoing;
 using ImageGlass.Common.ServiceProviders;
 using ImageGlass.Common.ServiceProviders.Licensing;
-using ImageGlass.Common.ServiceProviders.Update;
 using ImageGlass.Common.Types;
 using ImageGlass.Plugins;
 using ImageGlass.SDK.Plugins;
@@ -131,11 +130,6 @@ public static class Core
     public static SlideshowProvider? Slideshow { get; set; } = null;
 
 
-    /// <summary>
-    /// Checks for app updates and, where the packaging format allows, installs them in place.
-    /// </summary>
-    public static IUpdateProvider UpdateProvider { get; set; } = new UpdateProvider();
-
 
     /// <summary>
     /// Singleton loader that owns every native plugin shared library for the process lifetime.
@@ -225,11 +219,6 @@ public static class Core
     /// </summary>
     public static HdrToneMappingOptions HdrToneMappingConfig { get; set; } = new();
 
-
-    /// <summary>
-    /// Whether a verified update package is downloaded and waiting to be installed.
-    /// </summary>
-    public static bool HasPendingUpdate => !string.IsNullOrWhiteSpace(Config?.UpdatePendingVersion);
 
 
     /// <summary>

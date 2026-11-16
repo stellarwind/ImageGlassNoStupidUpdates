@@ -72,7 +72,7 @@ ImageGlass v10 is a complete rewrite in **C# with .NET 11**, using **Avalonia 12
      - Win32: `ImageGlass.Win32/Common/ServiceProviders/*`
      - Linux: `ImageGlass.Linux/Common/ServiceProviders/*`
      - macOS: `ImageGlass.Mac/Common/ServiceProviders/*`
-   - Shared concrete providers in library: `PhotoPreviewProvider`, `SlideshowProvider`, `UpdateProvider`
+   - Shared concrete providers in library: `PhotoPreviewProvider`, `SlideshowProvider`
    - Examples: `IFileSearchProvider`, `IShellProvider`, `IPrintProvider`, `IWindowColorProfileProvider`, `IPhotoPreviewProvider`
    - Registered at startup in each platform's `Program.cs`; initialized in `App.xaml.cs`
 
@@ -117,11 +117,9 @@ ImageGlass.Lib/
 │   ├── ServiceProviders/          # Interface contracts + shared providers
 │   │   ├── AppAPIs/               # App API provider interfaces
 │   │   ├── FileSearchService/     # File search service abstractions
-│   │   ├── Update/                # Update provider abstractions
 │   │   ├── I*.cs                  # Interfaces (IFileSearchProvider, IShellProvider, etc.)
 │   │   ├── PhotoPreviewProvider.cs
-│   │   ├── SlideshowProvider.cs
-│   │   └── UpdateProvider.cs
+│   │   └── SlideshowProvider.cs
 │   └── Types/                     # Base classes + shared types: PhReactive, PhDisposable, InterlockedBool, Resx, Const, Hotkey, SKImageRef, Enums, Dir
 │       └── JsonTypeConverters/    # AOT-safe JSON converters (see "Reusing Shared Code")
 ├── Plugins/                       # Native plugin host: PluginRegistry, codec proxies
@@ -142,7 +140,7 @@ ImageGlass.Lib/
 │   │   └── ZoomAndPan/            # Gesture recognizers, zoom/pan math
 │   └── Windowing/                 # PhWindow, ModalWindow, DialogWindow, PhColorPickerDialog
 ├── ViewModels/                    # MainWindowViewModel, MainWindowModel, SettingsViewModel
-└── Windows/                       # Top-level windows: MainWindow, AboutWindow, SettingsWindow, UpdateWindow, ExportFramesWindow
+└── Windows/                       # Top-level windows: MainWindow, AboutWindow, SettingsWindow, ExportFramesWindow
     ├── Main/                      # MainWindow_View partial
     ├── Print/                     # PrintWindow, its view, preview and layout tiles
     └── Settings/                  # Settings UI: Controls/, Pages/, Windows/
@@ -393,21 +391,6 @@ Occurs in `Program.cs` before Avalonia app setup (Linux/Mac have equivalent regi
 - `ConfigDir()` swallows directory-creation failures on purpose: a read-only config dir must not throw out of a path getter, or startup crashes before it can report the real problem.
 - Shipped by the **ZIP packer only** (`__assets/win/script-pack-win-zip.ps1`, `-NoPortable` to omit). Never add it to `__assets/__app`: the MSIX payload folder is read-only, so a packaged build would refuse to start.
 
-### Linux self-update (`LinuxUpdateProvider`)
-- Same shared pipeline as the sideload MSIX (Pro, download-now/install-on-click, sha256), with artifacts `linux-<arch>-appimage` and `linux-<arch>-flatpak`. The tarball stays check-only.
-- **AppImage: two renames in the image's own folder, never an in-place write.** The running session reads its FUSE mount through the old inode, so a truncating write corrupts it. The path is kept, so launchers and associations still resolve. Supported only when that folder is writable.
-- **The relaunch is also a probe.** If the new process exits non-zero within `RELAUNCH_PROBE_MS`, the old image is renamed back. An AppImage runs on the host glibc, so a release that raises the floor would otherwise leave an install that cannot even report the failure. A session started with `--appimage-extract-and-run` relaunches with `APPIMAGE_EXTRACT_AND_RUN=1`, or a FUSE-less host fails a healthy build.
-- **Flatpak: bundle installs only.** A bundle's origin (`imageglass-origin`) has no URL, so `flatpak update` answers "Nothing to do."; the new `.flatpak` goes through `flatpak install --bundle` on the host instead. An install from a remote with a URL (Flathub, or the dev install `flatpak-builder --install` makes) stays check-only: a bundle over it keeps that origin but deploys a commit the remote lacks, and the next `flatpak update` can downgrade it.
-- Host `flatpak` commands target the installation the app runs from, read from `/.flatpak-info` `app-path` (`--system` for `/var/lib/flatpak`, else `--user` plus `FLATPAK_USER_DIR`), and need `--talk-name=org.freedesktop.Flatpak`. **Never pass `--noninteractive`**: it also suppresses the polkit prompt a system installation needs. Exit code 0 proves nothing (`Nothing to do.` is 0), so success means the deployed commit changed.
-- The new instance must start on the host (`flatpak-spawn --host flatpak run`); a child inside the sandbox dies with it. Both formats release `Core.AppInstance` first, or the new process hands its launch to the exiting one, and they clear the pending update before relaunching, or the old instance's close-time save re-arms it.
-- The install-while-alive helpers (`RunInstallThenExitAsync`, `RelaunchAsync`, `ForgetInstalledUpdateAsync`, `RunCommandAsync`) live in the base `UpdateProvider`, shared with macOS.
-
-### macOS self-update (`MacUpdateProvider`)
-- Same shared pipeline, artifact `mac-<arch>-dmg` (only arm64 is published, so an Intel build stays check-only). Supported only when running as `<name>.app/Contents/MacOS/<exe>` with the bundle and its folder passing `access(W_OK)`: a loose dev binary, a Gatekeeper-translocated copy, the DMG volume itself, or a non-admin's `/Applications` stay check-only.
-- **The DMG is mounted privately (`hdiutil attach -nobrowse -readonly -mountpoint $TMPDIR/…`), its root `.app` is `ditto`'d beside the running bundle, then swapped in by two renames**, never copied over: this session keeps reading its files through the renamed bundle, and the path (Dock, Finder, associations) is unchanged. A renamed bundle still validates, so the hidden `.<name>.app.<pid>.new` sibling is checked in place.
-- **The staged copy must satisfy the running app's own designated requirement** (`MacCodeSignApi`, Security.framework with the `codesign --verify --deep --strict` flags): same identifier, Developer ID, same team. `HttpClient` downloads carry no quarantine, so Gatekeeper never assesses the new app; this check stands in for it. An ad-hoc dev build has no team to pin and only demands a valid signature. A rejected package is discarded.
-- The relaunch starts the new binary directly and doubles as the probe (`RELAUNCH_PROBE_MS`); an early non-zero exit renames the old bundle back. `IsMeteredConnection` is not implemented on macOS (always `false`).
-
 ### Photo transitions (`UI/Viewer/Transitions/`)
 - **Effects are written only in gl-transitions GLSL** (`vec4 transition(vec2 uv)` with `getFromColor`/`getToColor`/`progress`/`ratio`), built-ins included. SkSL is a backend detail: `GlTransitionsAdapter` translates GLSL to an `SKRuntimeEffect` (GPU through Avalonia's Skia lease, CPU raster without a `GRContext`, AOT-safe since the source is a string). Avalonia plans to move from Skia to Impeller, so never let SkSL leak into an effect file; an Impeller port replaces the adapter, not the effects.
 - **The adapter's inputs are a frozen contract**: only add, never rename or remove, or every shipped and user effect breaks. On top of gl-transitions it adds `resolution` (logical px) and `navigationDirection` (1 forward, -1 backward); it is not `direction`, which real gl-transitions effects already declare as a parameter. `PhotoRenderer` sets an input only if the shader declares it, so a new input is backward compatible. The adapter also renames a bare `half`, a plain GLSL name that SkSL reserves as a type; add any other SkSL-only keyword the same way if an effect trips over it. `ToSkSL` normalizes line endings before any regex: git `autocrlf` checks effect files out as CRLF, a multiline `$` matches only before `
@@ -608,7 +591,7 @@ Scripts in `__assets/<win|mac|linux>/`, VS Code tasks `pack-*`, output in `__art
 - **Version**: `Directory.Build.props` is the only place to bump (`IgVersion`, `IgReleaseType`, `IgBundleShortVersion`, `IgBundleBuild`). `Directory.Build.targets` bakes it into `AppBuildInfo.g.cs`, so packing a stale publish dir ships old code under a new version. The msstore MSIX uses `<Major>.<Minor>.<IgBundleBuild>.0` (the Store reserves the 4th part); the sideload MSIX and the MSI use `IgVersion` verbatim.
 - **Windows** (`script-pack-win-msix.ps1`, `script-pack-win-zip.ps1`): two MSIX flavours (msstore: unsigned, Store re-signs, virtualized; signed sideload: `-Sign -UnvirtualizedResources`), plus the portable ZIP that writes `.igportable` unless `-NoPortable`. Both scripts publish a fresh AOT build themselves.
 - **macOS** (`script-pack-mac-arm64-app.sh` -> `-dmg.sh`): `Contents/MacOS` may hold only Mach-O files, so bundled data is staged into `Contents/Resources/` and symlinked back or `codesign` fails. The DMG is Developer ID signed, notarized, and stapled.
-- **Linux** (`script-pack-linux-x64-flatpak.sh`, `script-pack-linux-x64-appimage.sh`): the Flatpak manifest installs a prebuilt tarball, so the GitHub release must exist before Flathub submission, and `--disable-cache` is mandatory or the bundle ships the previous binary. The AppImage stages an AppDir with the payload under `usr/lib/imageglass/` (mirroring the Flatpak's `/app/imageglass/`, so `BHelper.BaseDir()` behaves identically in both) and a generated `AppRun`; unlike Flatpak it runs against the **host** glibc and host libraries. NativeAOT links against the *build* machine's glibc (a plain 24.04 publish needed 2.38, #2484), so both Linux scripts publish with `-p:SysRoot` against a pinned Ubuntu 20.04 sysroot (`script-linux-x64-sysroot.sh`, sha256-checked `.deb`s cached in `__artifacts/tools/`) and **fail** when a shipped ELF needs more than its glibc 2.31. `LinkNative`'s only inputs are the object files, so a `SysRoot` change alone never relinks; the scripts delete the old linked binary first. Both share one `metainfo.xml`, in `__assets/linux/flatpak/`. The AppImage also embeds `gh-releases-zsync` update information (tag `latest` for stable, `latest-all` when `IgReleaseType` is non-empty or `IgUpdateChannel` is not `stable`, so an rc/beta still rolls onto the stable superseding it) and emits a `.zsync` that **must** be uploaded to the same release — its `URL:` is relative, and an image advertising an update with no `.zsync` fails every check. `zsyncmake` writes into the **CWD**, not beside its input, so appimagetool is run from `__artifacts/bundle/`.
+- **Linux** (`script-pack-linux-x64-flatpak.sh`, `script-pack-linux-x64-appimage.sh`): the Flatpak manifest installs a prebuilt tarball, so the GitHub release must exist before Flathub submission, and `--disable-cache` is mandatory or the bundle ships the previous binary. The AppImage stages an AppDir with the payload under `usr/lib/imageglass/` (mirroring the Flatpak's `/app/imageglass/`, so `BHelper.BaseDir()` behaves identically in both) and a generated `AppRun`; unlike Flatpak it runs against the **host** glibc and host libraries. NativeAOT links against the *build* machine's glibc (a plain 24.04 publish needed 2.38, #2484), so both Linux scripts publish with `-p:SysRoot` against a pinned Ubuntu 20.04 sysroot (`script-linux-x64-sysroot.sh`, sha256-checked `.deb`s cached in `__artifacts/tools/`) and **fail** when a shipped ELF needs more than its glibc 2.31. `LinkNative`'s only inputs are the object files, so a `SysRoot` change alone never relinks; the scripts delete the old linked binary first. Both share one `metainfo.xml`, in `__assets/linux/flatpak/`.
 - **`__assets/__app/` is shared payload**; `_ext_icons` is Windows-only and is stripped for macOS, Linux, and the msstore MSIX. `.igportable` must never live there (a read-only MSIX payload would refuse to start).
 
 ---

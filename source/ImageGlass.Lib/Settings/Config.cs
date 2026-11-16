@@ -462,15 +462,6 @@ public partial class Config : PhReactive
     }
 
     /// <summary>
-    /// Enables / Disables downloading app updates in the background so they are ready to install.
-    /// </summary>
-    public bool EnableAutoInstallUpdate
-    {
-        get => Get(ConfigId.EnableAutoInstallUpdate, false);
-        set => Set(ConfigId.EnableAutoInstallUpdate, value);
-    }
-
-    /// <summary>
     /// Enables, disables debug mode.
     /// </summary>
     public bool EnableDebug
@@ -693,34 +684,6 @@ public partial class Config : PhReactive
 
 
     #region String items
-
-    /// <summary>
-    /// Gets, sets the last time to check for update. Set it to <c>0</c> to disable auto-update.
-    /// </summary>
-    public string AutoUpdate
-    {
-        get => Get(ConfigId.AutoUpdate, BHelper.FormatUtcRoundtrip(DateTime.UtcNow.AddDays(-30)));
-        set => Set(ConfigId.AutoUpdate, value);
-    }
-
-    /// <summary>
-    /// Gets, sets the version string the user chose to skip (e.g. "10.1.0.500").
-    /// </summary>
-    public string UpdateSkippedVersion
-    {
-        get => Get(ConfigId.UpdateSkippedVersion, string.Empty);
-        set => Set(ConfigId.UpdateSkippedVersion, value);
-    }
-
-
-    /// <summary>
-    /// Gets, sets the version of the verified update package waiting to be installed.
-    /// </summary>
-    public string UpdatePendingVersion
-    {
-        get => Get(ConfigId.UpdatePendingVersion, string.Empty);
-        set => Set(ConfigId.UpdatePendingVersion, value);
-    }
 
     /// <summary>
     /// Gets, sets color profile string. It can be a defined name or ICC/ICM file path

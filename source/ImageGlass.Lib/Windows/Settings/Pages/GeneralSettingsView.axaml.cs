@@ -18,11 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
 using ImageGlass.Common.Localization;
-using ImageGlass.Common.ServiceProviders;
-using ImageGlass.Common.ServiceProviders.Update;
 using ImageGlass.UI.Windowing;
 using ImageGlass.Windows;
-using System;
 using System.IO;
 
 namespace ImageGlass.Common.Windows;
@@ -72,75 +69,9 @@ public partial class GeneralSettingsView : SettingsPageView
         BindToggle(PART_MultiInstances, ConfigId.EnableMultiInstances,
             LangId.Settings_EnableMultiInstances, LangId.Settings_Startup);
 
-        // App update — AutoUpdate is stored as a date string; "0" means disabled.
-        BindAutoUpdateToggle(PART_AutoUpdate, ConfigId.AutoUpdate,
-            LangId.Settings_AutoUpdate, LangId.Settings_AppUpdate);
-        BindLink(PART_SeeWhatIsSent, LangId.Settings_SeeWhatIsSent, ShowUsageStatsPreview);
-
-        BindToggle(PART_AutoInstallUpdate, ConfigId.EnableAutoInstallUpdate,
-            LangId.Settings_EnableAutoInstallUpdate, LangId.Settings_AppUpdate);
-        ProGate(ConfigId.EnableAutoInstallUpdate, PART_AutoInstallUpdateBadge, PART_AutoInstallUpdate);
-
-        // nothing to offer on a channel that cannot install its own updates, or when an admin locked it
-        var canSelfUpdate = Core.UpdateProvider.CanInstallUpdate;
-        PART_AutoInstallUpdateRow.IsVisible = canSelfUpdate;
-        SetLocalizedText(PART_CheckForUpdate, LangId._CheckForUpdate);
-        PART_CheckForUpdate.Click += (_, _) => CheckForUpdate();
-        PART_CheckForUpdate.IsVisible = !FeatureManager.IsLocked(API.IG_CheckForUpdate);
-        RegisterSearchKey(PART_CheckForUpdate, LangId._CheckForUpdate, null, LangId.Settings_AppUpdate);
-
         // Others
         BindIntInput(PART_MsgDuration, ConfigId.InAppMessageDuration,
             LangId.Settings_InAppMessageDuration, LangId.Settings_Others);
-    }
-
-
-    /// <summary>
-    /// Binds a checkbox to the string-based <c>AutoUpdate</c> config (date string vs. "0").
-    /// </summary>
-    private void BindAutoUpdateToggle(CheckBox chk, ConfigId id, LangId label, LangId? section)
-    {
-        var current = VM.GetValue(id, "0");
-        chk.IsChecked = !string.Equals(current, "0", StringComparison.OrdinalIgnoreCase);
-        chk.IsCheckedChanged += (_, _) =>
-            VM.SetValue(id, (chk.IsChecked ?? false) ? BHelper.FormatUtcRoundtrip(DateTime.UtcNow) : "0");
-
-        RegisterSearchKey(chk, label, id, section);
-    }
-
-
-    /// <summary>
-    /// Runs a manual update check: opens the update window in its checking state.
-    /// </summary>
-    private static async void CheckForUpdate()
-    {
-        try
-        {
-            _ = await Core.API.RunApiAsync(API.IG_CheckForUpdate, "true");
-        }
-        catch {}
-    }
-
-
-    /// <summary>
-    /// Shows the exact User-Agent this install would send on a scheduled update check.
-    /// </summary>
-    private async void ShowUsageStatsPreview()
-    {
-        try
-        {
-            var owner = TopLevel.GetTopLevel(this) as PhWindow;
-
-            _ = await ModalWindow.ShowInfoAsync(owner, new ModalWindowOptions
-            {
-                Title = Core.Lang[LangId.Settings_SeeWhatIsSent],
-                Details = UsageStatsAgent.Build(withStats: true),
-            });
-        }
-        catch
-        {
-            // an async void handler must never reach the unhandled-error dialog
-        }
     }
 
 

@@ -126,9 +126,7 @@ public enum API
     // Menu > Help
     IG_OpenAboutWindow,
     IG_ManageLicense,
-    IG_CheckForUpdate,
-    IG_InstallUpdate,
-    IG_ReportIssue,
+    IG_ReportIssue = 84,
     IG_QuickSetup,
     IG_SetDefaultPhotoViewer,
     IG_RemoveDefaultPhotoViewer,

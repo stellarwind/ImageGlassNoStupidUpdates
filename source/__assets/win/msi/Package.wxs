@@ -205,7 +205,6 @@
     <Property Id="ARPCONTACT"       Value="phap@imageglass.org" />
     <Property Id="ARPHELPLINK"      Value="https://imageglass.org/support" />
     <Property Id="ARPURLINFOABOUT"  Value="https://imageglass.org" />
-    <Property Id="ARPURLUPDATEINFO" Value="https://imageglass.org/download" />
     <Property Id="ARPCOMMENTS"      Value="A Fast, Seamless Photo Viewer" />
 
     <!-- One feature only, so Change would be a dead end; Repair still works from a re-run. -->

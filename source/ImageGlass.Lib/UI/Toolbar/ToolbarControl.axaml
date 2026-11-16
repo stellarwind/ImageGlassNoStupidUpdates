@@ -79,26 +79,6 @@
 
                 <!--  Main Menu button  -->
                 <Panel>
-                    <!--  Update ready badge  -->
-                    <Border
-                        x:Name="PART_UpdateBadge"
-                        Width="13"
-                        Height="13"
-                        Margin="0,4,4,0"
-                        Padding="2"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Background="{DynamicResource PhAccentFill}"
-                        CornerRadius="7"
-                        IsHitTestVisible="False"
-                        IsVisible="False"
-                        ZIndex="95">
-                        <Path
-                            Data="{StaticResource IconUpdateIndicator}"
-                            Fill="{DynamicResource AccentButtonForeground}"
-                            Stretch="Uniform" />
-                    </Border>
-
                     <ui:ToolbarButton
                         x:Name="PART_BtnMainMenu"
                         DataContext="{CompiledBinding ButtonMenuVM}"
@@ -110,18 +90,6 @@
                                 x:Name="PART_MainMenu"
                                 HorizontalOffset="6"
                                 Placement="BottomEdgeAlignedRight">
-
-                                <!--  Install update (only when a package is ready)  -->
-                                <ui:PhMenuItem
-                                    x:Name="PART_MnuInstallUpdate"
-                                    Classes="attention"
-                                    Click="MainMenuItem_Click"
-                                    IsVisible="False"
-                                    LangKey="Menu_MnuInstallUpdate" />
-                                <ui:PhMenuItem
-                                    x:Name="PART_MnuInstallUpdateSeparator"
-                                    Header="-"
-                                    IsVisible="False" />
 
                                 <!--  File  -->
                                 <ui:PhMenuItem LangKey="Menu_MnuFile">
@@ -558,7 +526,6 @@
 
                                     <ui:PhMenuItem Header="-" />
 
-                                    <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="_CheckForUpdate" />
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuQuickSetup" />
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuReportIssue" />
 

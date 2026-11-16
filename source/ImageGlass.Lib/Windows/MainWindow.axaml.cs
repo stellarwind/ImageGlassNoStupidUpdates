@@ -320,9 +320,9 @@ public partial class MainWindow : PhWindow
 
 
     /// <summary>
-    /// Captures live window/viewer state into config and saves it; also used before a self-update kills us.
+    /// Captures live window and viewer state and saves it to the config file.
     /// </summary>
-    internal async Task<bool> CaptureAndSaveConfigAsync()
+    private async Task<bool> CaptureAndSaveConfigAsync()
     {
         // 1. save full screen mode; a minimized window reports the state it will restore to
         Core.Config.EnableFullScreen = RestorableWindowState == WindowState.FullScreen;

@@ -475,10 +475,6 @@ public class Lang
         new(LangId._ResetToDefault, "Reset to default"), //v9.0
         new(LangId._Default, "Default"), //v10.0
         new(LangId._BackgroundColor, "Background color"), //v10.0
-        new(LangId._CheckForUpdate, "Check for update…"), //v5.0
-        new(LangId._Update, "Update"), //v9.0
-        new(LangId._Download, "Download"), //v10.0
-        new(LangId._RestartNow, "Restart now"), //v10.0
         new(LangId._Website, "Website"), //v9.0
         new(LangId._TypeToFilter, "Type to filter…"),
         new(LangId._Delete, "Delete"),
@@ -911,20 +907,6 @@ public class Lang
         new(LangId.Menu_MnuQuickSetup, "Open ImageGlass Quick Setup"), //v9.0
         new(LangId.Menu_MnuReportIssue, "Report an issue…"), //v3.0
 
-        new(LangId.Menu_MnuCheckForUpdate_NewVersion, "A new update is available!"), //v5.0
-        new(LangId.Menu_MnuCheckForUpdate_NoUpdate, "You are using the latest version!"),
-        new(LangId.Menu_MnuCheckForUpdate_Checking, "Checking for update…"),
-        new(LangId.Menu_MnuCheckForUpdate_Failed, "Could not check for update!"),
-        new(LangId.Menu_MnuCheckForUpdate_SkipVersion, "Skip this version"),
-        new(LangId.Menu_MnuCheckForUpdate_CurrentVersion, "Current version: {0}" ), //v9.0
-        new(LangId.Menu_MnuCheckForUpdate_LatestVersion, "The latest version: {0}" ), //v9.0
-        new(LangId.Menu_MnuCheckForUpdate_PublishedDate, "Published date: {0}" ), //v9.0
-        new(LangId.Menu_MnuCheckForUpdate_ReadyToInstall, "Update ready to install"), //v10.0
-        new(LangId.Menu_MnuCheckForUpdate_Downloading, "Downloading the update…"), //v10.0
-        new(LangId.Menu_MnuCheckForUpdate_Installing, "Installing the update…"), //v10.0
-        new(LangId.Menu_MnuInstallUpdate, "Install update…"), //v10.0
-        new(LangId.Menu_MnuInstallUpdate_Confirm, "ImageGlass will close and reopen to finish the update."), //v10.0
-        new(LangId.Menu_MnuCheckForUpdate_ProFromStore, "Get ImageGlass Pro from Store"), // v10.0
 
         new(LangId.Menu_MnuSetDefaultPhotoViewer, "Set default photo viewer"), //v9.0
         new(LangId.Menu_MnuSetDefaultPhotoViewer_Success, "You have successfully set ImageGlass as default photo viewer."), //v9.0
@@ -986,15 +968,8 @@ public class Lang
         new(LangId.Settings_EnableFileWatcher, "Monitor file changes in the viewing folder and update in realtime"),
         new(LangId.Settings_EnableAutoOpenNewAddedImage, "Open the new added image automatically"),
 
-        // General > App update
-        new(LangId.Settings_AppUpdate, "App update"),
-        new(LangId.Settings_AutoUpdate_Description, "The update check also includes a short anonymous message that helps improve ImageGlass. It contains no name, no account, and no identifier, and nothing about your files. Turning this off stops it completely."),
-        new(LangId.Settings_SeeWhatIsSent, "See exactly what is sent…"),
-        new(LangId.Settings_EnableAutoInstallUpdate, "Download and install updates automatically"), //v10.0
-
         // General > Others
         new(LangId.Settings_Others, "Others"),
-        new(LangId.Settings_AutoUpdate, "Check for update automatically"),
         new(LangId.Settings_EnableMultiInstances, "Allow multiple instances of the program"),
         new(LangId.Settings_ShowAppIcon, "Show app icon on the title bar"),
         new(LangId.Settings_InAppMessageDuration, "In-app message duration (milliseconds)"),

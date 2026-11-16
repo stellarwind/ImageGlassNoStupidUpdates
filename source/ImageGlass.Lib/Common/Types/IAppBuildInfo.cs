@@ -34,10 +34,5 @@ public interface IAppBuildInfo
     /// Gets the release type. e.g. <c>stable</c>, <c>beta</c>, <c>preview</c>.
     /// </summary>
     string ReleaseType { get; }
-
-    /// <summary>
-    /// Gets the update channel, either <c>stable</c> or <c>beta</c>.
-    /// </summary>
-    string UpdateChannel { get; }
 }
 

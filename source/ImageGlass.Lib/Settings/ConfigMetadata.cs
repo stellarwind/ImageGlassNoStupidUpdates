@@ -76,8 +76,7 @@ public enum ConfigId
     EnableCutMultipleFiles,
     EnableFileWatcher,
     EnableAutoOpenNewAddedImage,
-    EnableAutoInstallUpdate,
-    EnableDebug,
+    EnableDebug = 46,
 
     #endregion // Boolean settings
 
@@ -112,10 +111,7 @@ public enum ConfigId
 
     #region String settings
 
-    AutoUpdate,
-    UpdateSkippedVersion,
-    UpdatePendingVersion,
-    ColorProfile,
+    ColorProfile = 72,
     LastSeenImagePath,
     LastOpenedTool,
     LastOpenedSetting,

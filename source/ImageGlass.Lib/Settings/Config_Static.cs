@@ -116,7 +116,6 @@ public partial class Config
         ConfigId.MouseClickActions,
         ConfigId.EnableFreePan,
         ConfigId.PanMargin,
-        ConfigId.EnableAutoInstallUpdate,
     }.ToFrozenSet();
 
 

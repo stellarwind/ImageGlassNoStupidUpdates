@@ -143,11 +143,6 @@
                 MinWidth="80"
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center" />
-            <ui:PhButton
-                x:Name="PART_BtnCheckForUpdate"
-                MinWidth="80"
-                HorizontalContentAlignment="Center"
-                VerticalContentAlignment="Center" />
         </StackPanel>
     </uiw:DialogWindow.DialogFooterLeftContent>
 
