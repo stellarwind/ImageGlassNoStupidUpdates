@@ -31,9 +31,7 @@ namespace ImageGlass.Win32.Common.ServiceProviders;
 public class Win32StoreEntitlementProvider : IStoreEntitlementProvider
 {
     /// <summary>
-    /// Payload folder holding the license bundled for export. Staged by
-    /// <c>__assets/win/script-pack-win-msix.ps1</c> for the msstore flavour only; the signed
-    /// flavour refuses to build if it finds one.
+    /// Payload folder holding the exportable license in the upstream Microsoft Store package.
     /// </summary>
     private const string BUNDLED_LICENSE_DIR = "_store";
 

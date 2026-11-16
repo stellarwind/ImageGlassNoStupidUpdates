@@ -32,8 +32,7 @@ public static class Win32AppIdentity
     private const int ERROR_INSUFFICIENT_BUFFER = 122;
 
     /// <summary>
-    /// Identity Name the packer stamps on the Microsoft Store flavour. Keep in sync with
-    /// <c>-MsStoreIdentityName</c> in <c>__assets/win/script-pack-win-msix.ps1</c>.
+    /// Identity name of the upstream Microsoft Store package.
     /// </summary>
     private const string MSSTORE_IDENTITY_NAME = "9662DuongDieuPhap.ImageGlass";
 
