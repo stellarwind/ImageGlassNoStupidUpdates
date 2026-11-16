@@ -796,15 +796,10 @@ public partial class ToolbarControl : PhControl
         // multi-frame format
         var hasMultiFrames = Core.Photos.CurrentMetadata?.FrameCount > 1;
         PART_MnuExportFrames.IsEnabled
-            = PART_MnuViewNextFrame.IsEnabled
-            = PART_MnuViewPreviousFrame.IsEnabled
-            = PART_MnuViewFirstFrame.IsEnabled
-            = PART_MnuViewLastFrame.IsEnabled
             = hasMultiFrames;
 
-        // Pro licensing: one item per state; an expired license is managed, not pitched
+        // Show license management when a license exists.
         var isManagingLicense = Core.IsProEnabled || Core.ExpiredLicense is not null;
-        PART_MnuUpgradeLicense.IsVisible = !isManagingLicense;
         PART_MnuManageLicense.IsVisible = isManagingLicense;
     }
 

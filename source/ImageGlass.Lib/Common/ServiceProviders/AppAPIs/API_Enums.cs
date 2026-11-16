@@ -51,14 +51,9 @@ public enum API
     IG_Goto,
     IG_GotoFirst,
     IG_GotoLast,
-    IG_ViewFrame,
-    IG_ViewNextFrame,
-    IG_ViewPreviousFrame,
-    IG_ViewFirstFrame,
-    IG_ViewLastFrame,
 
     // Menu > Zoom
-    IG_CustomZoom,
+    IG_CustomZoom = 30,
     IG_SetZoom,
     IG_SetZoomForMouseClick,
     IG_ZoomIn,
@@ -102,14 +97,10 @@ public enum API
 
     // Menu > Window mode
     IG_ToggleWindowFit,
-    IG_ToggleFrameless,
-    IG_ToggleFullScreen,
-    IG_ToggleSlideshow,
-    IG_ToggleSlideshowPlayback,
-    IG_ToggleSlideshowCountdown,
+    IG_ToggleFullScreen = 67,
 
     // Menu > Layout
-    IG_ToggleToolbar,
+    IG_ToggleToolbar = 71,
     IG_ToggleGallery,
     IG_ToggleCheckerboard,
     IG_ToggleWindowTopMost,
@@ -127,8 +118,7 @@ public enum API
     IG_OpenAboutWindow,
     IG_ManageLicense,
     IG_ReportIssue = 84,
-    IG_QuickSetup,
-    IG_SetDefaultPhotoViewer,
+    IG_SetDefaultPhotoViewer = 86,
     IG_RemoveDefaultPhotoViewer,
 
     // Menu > Exit

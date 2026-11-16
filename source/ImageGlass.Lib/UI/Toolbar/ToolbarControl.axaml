@@ -137,24 +137,6 @@
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuGoTo" />
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuGoToFirst" />
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuGoToLast" />
-                                    <ui:PhMenuItem Header="-" />
-
-                                    <ui:PhMenuItem
-                                        x:Name="PART_MnuViewNextFrame"
-                                        Click="MainMenuItem_Click"
-                                        LangKey="Menu_MnuViewNextFrame" />
-                                    <ui:PhMenuItem
-                                        x:Name="PART_MnuViewPreviousFrame"
-                                        Click="MainMenuItem_Click"
-                                        LangKey="Menu_MnuViewPreviousFrame" />
-                                    <ui:PhMenuItem
-                                        x:Name="PART_MnuViewFirstFrame"
-                                        Click="MainMenuItem_Click"
-                                        LangKey="Menu_MnuViewFirstFrame" />
-                                    <ui:PhMenuItem
-                                        x:Name="PART_MnuViewLastFrame"
-                                        Click="MainMenuItem_Click"
-                                        LangKey="Menu_MnuViewLastFrame" />
                                 </ui:PhMenuItem>
 
 
@@ -424,21 +406,8 @@
                                     ToggleType="CheckBox" />
                                 <ui:PhMenuItem
                                     Click="MainMenuItem_Click"
-                                    IsChecked="{CompiledBinding Config.EnableFrameless}"
-                                    IsVisible="{OnPlatform True,
-                                                           Linux=False,
-                                                           x:TypeArguments=x:Boolean}"
-                                    LangKey="Menu_MnuFrameless"
-                                    ToggleType="CheckBox" />
-                                <ui:PhMenuItem
-                                    Click="MainMenuItem_Click"
                                     IsChecked="{CompiledBinding Config.EnableFullScreen}"
                                     LangKey="Menu_MnuFullScreen"
-                                    ToggleType="CheckBox" />
-                                <ui:PhMenuItem
-                                    Click="MainMenuItem_Click"
-                                    IsChecked="{CompiledBinding Config.EnableSlideshow}"
-                                    LangKey="Menu_MnuSlideshow"
                                     ToggleType="CheckBox" />
                                 <ui:PhMenuItem Header="-" />
 
@@ -479,24 +448,8 @@
                                         LangKey="Menu_MnuCropTool" />
                                     <ui:PhMenuItem
                                         Click="MainMenuItem_Click"
-                                        IconData="{StaticResource IconToolFrameNav}"
-                                        LangKey="Menu_MnuFrameNav" />
-                                    <ui:PhMenuItem
-                                        Click="MainMenuItem_Click"
-                                        IconData="{StaticResource IconToolHdrToneMapper}"
-                                        LangKey="Menu_MnuHdrToneMapper" />
-                                    <ui:PhMenuItem
-                                        Click="MainMenuItem_Click"
-                                        IconData="{StaticResource IconToolProjector}"
-                                        LangKey="Menu_MnuProjector" />
-                                    <ui:PhMenuItem
-                                        Click="MainMenuItem_Click"
                                         IconData="{StaticResource IconToolImageResizer}"
                                         LangKey="Menu_MnuResizeTool" />
-                                    <ui:PhMenuItem
-                                        Click="MainMenuItem_Click"
-                                        IconData="{StaticResource IconToolLosslessCompression}"
-                                        LangKey="Menu_MnuLosslessCompression" />
                                     <ui:PhMenuItem x:Name="PART_MnuExternalToolsBeginSeparator" Header="-" />
 
                                     <ui:PhMenuItem
@@ -505,7 +458,6 @@
                                         IsVisible="False" />
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuToolsSettings" />
                                 </ui:PhMenuItem>
-                                <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuPlugins" />
 
 
                                 <!--  Settings  -->
@@ -516,17 +468,12 @@
                                 <!--  Help  -->
                                 <ui:PhMenuItem LangKey="Menu_MnuHelp">
                                     <ui:PhMenuItem
-                                        x:Name="PART_MnuUpgradeLicense"
-                                        Click="MainMenuItem_Click"
-                                        LangKey="Menu_MnuUpgradeLicense" />
-                                    <ui:PhMenuItem
                                         x:Name="PART_MnuManageLicense"
                                         Click="MainMenuItem_Click"
                                         LangKey="Menu_MnuManageLicense" />
 
                                     <ui:PhMenuItem Header="-" />
 
-                                    <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuQuickSetup" />
                                     <ui:PhMenuItem Click="MainMenuItem_Click" LangKey="Menu_MnuReportIssue" />
 
                                     <ui:PhMenuItem Header="-" />

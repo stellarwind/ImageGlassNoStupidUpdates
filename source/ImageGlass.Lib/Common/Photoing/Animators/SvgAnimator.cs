@@ -178,7 +178,7 @@ public sealed class SvgAnimator : AnimatorImpl
 
     /// <summary>
     /// Rasterizes the current SVG picture to an <see cref="SKImage"/> for pixel
-    /// operations (copy, export, frame-nav thumbnail).
+    /// operations such as copy and export.
     /// </summary>
     public override SKImage? GetRenderedFrameBitmap(uint frameIndex)
     {

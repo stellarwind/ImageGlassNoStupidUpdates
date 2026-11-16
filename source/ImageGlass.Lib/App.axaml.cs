@@ -35,7 +35,6 @@ using ImageGlass.Common.Types;
 using ImageGlass.Common.Windows;
 using ImageGlass.UI.Windowing;
 using ImageGlass.ViewModels;
-using ImageGlass.Windows;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -157,8 +156,7 @@ public partial class App : Application
 
             desktop.MainWindow = MainWindow;
 
-            // if user settings failed to load, report it first; on Quit the modal exits the app,
-            // on Continue we fall through to Quick Setup (which the reset/default config triggers)
+            // Report a config load error before showing the main window.
             if (Config.LoadingException is not null)
             {
                 var isContinue = await ModalWindow.ShowUnhandledErrorAsync(
@@ -167,12 +165,8 @@ public partial class App : Application
                 if (!isContinue) return;
             }
 
-            // if an incompatible user config was found and reset, warn before continuing;
-            // on No we exit without writing config, on Yes we fall through to Quick Setup
+            // Ask before continuing with defaults when the user config is incompatible.
             if (!await ConfirmIncompatibleConfigResetAsync()) return;
-
-            // force Quick Setup on first run; false = app is exiting/restarting
-            if (!await RunStartupQuickSetupAsync()) return;
 
             // show main window
             MainWindow.Show();
@@ -227,7 +221,6 @@ public partial class App : Application
 
     private void AppMenuAbout_Click(object? sender, EventArgs e) => RunAppMenuAction(LangId.Menu_MnuAbout);
 
-    private void AppMenuUpgradeLicense_Click(object? sender, EventArgs e) => RunAppMenuAction(LangId.Menu_MnuUpgradeLicense);
 
     private void AppMenuManageLicense_Click(object? sender, EventArgs e) => RunAppMenuAction(LangId.Menu_MnuManageLicense);
 
@@ -265,8 +258,7 @@ public partial class App : Application
             }
 
             // show only the licensing item matching the current license state
-            if (langId == LangId.Menu_MnuUpgradeLicense) item.IsVisible = !Core.IsProEnabled;
-            else if (langId == LangId.Menu_MnuManageLicense) item.IsVisible = Core.IsProEnabled;
+            if (langId == LangId.Menu_MnuManageLicense) item.IsVisible = Core.IsProEnabled || Core.ExpiredLicense is not null;
         }
     }
 
@@ -494,40 +486,6 @@ public partial class App : Application
         }
 
         return true;
-    }
-
-
-    /// <summary>
-    /// Shows the forced startup Quick Setup when required. Returns <c>false</c> if the app is
-    /// exiting or restarting, so the caller must not show the main window.
-    /// </summary>
-    private static async Task<bool> RunStartupQuickSetupAsync()
-    {
-        // skip when already satisfied, or when relaunched with the suppress flag
-        if (!QuickSetupWindow.ShouldShowAtStartup || Core.Args.Contains(AppCmds.NO_QUICK_SETUP))
-            return true;
-
-        var wizard = new QuickSetupWindow();
-        await wizard.ShowAsync(null);
-
-        // Save already restarted the app
-        if (wizard.IsRestarting) return false;
-
-        // Skip: mark done, then restart into a clean process
-        if (wizard.DialogResult == DialogExitCode.Cancel)
-        {
-            Core.Config.QuickSetupVersion = Const.QUICK_SETUP_VERSION;
-            if (!await Core.Config.SaveAsync())
-            {
-                await ModalWindow.ShowSettingsSaveErrorAsync(null, Core.Lang[LangId.QuickSetup_Title]);
-            }
-            BHelper.RestartApp(suppressQuickSetup: true);
-            return false;
-        }
-
-        // Close / Alt+F4 / Esc: quit (forced; no main window to close for a graceful shutdown)
-        BHelper.ExitApp(true);
-        return false;
     }
 
 

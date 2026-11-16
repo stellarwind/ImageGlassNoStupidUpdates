@@ -206,7 +206,7 @@ public interface IShellProvider : IDisposable
 
 
     /// <summary>
-    /// Keeps the system and the display awake, e.g. while a slideshow plays. Best-effort.
+    /// Keeps the system and the display awake. Best-effort.
     /// </summary>
     void PreventSleep(string reason) { }
 

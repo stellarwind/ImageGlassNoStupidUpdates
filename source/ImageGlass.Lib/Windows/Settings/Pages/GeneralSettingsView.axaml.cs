@@ -19,7 +19,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia.Controls;
 using ImageGlass.Common.Localization;
 using ImageGlass.UI.Windowing;
-using ImageGlass.Windows;
 using System.IO;
 
 namespace ImageGlass.Common.Windows;
@@ -59,7 +58,7 @@ public partial class GeneralSettingsView : SettingsPageView
 
         // Actions
         BindLink(PART_GetHelp, LangId._GetHelp, OpenHelpDocs);
-        BindLink(PART_ResetSettings, LangId.Settings_ResetSettings, ShowQuickSetup);
+        BindLink(PART_ResetSettings, LangId.Settings_ResetSettings, ResetSettings);
 
         // Startup
         BindToggle(PART_WelcomeImage, ConfigId.EnableWelcomeImage,
@@ -91,19 +90,43 @@ public partial class GeneralSettingsView : SettingsPageView
     }
 
 
-    /// <summary>
-    /// Opens the Quick Setup wizard, which owns the reset-to-defaults flow.
-    /// </summary>
-    private async void ShowQuickSetup()
+    private async void ResetSettings()
     {
+        var owner = TopLevel.GetTopLevel(this) as PhWindow;
+        var title = Core.Lang[LangId.Settings_ResetSettings];
+
         try
         {
-            var quickSetup = new QuickSetupWindow();
-            _ = await quickSetup.ShowAsync(TopLevel.GetTopLevel(this) as PhWindow);
+            var confirmation = await ModalWindow.ShowWarningAsync(owner, new ModalWindowOptions
+            {
+                Title = title,
+                Heading = Core.Lang[LangId.Settings_ResetSettings_Confirm],
+            }, ModalWindowButton.Yes_No);
+            if (confirmation.ExitCode != DialogExitCode.OK) return;
+
+            if (BHelper.HasOtherInstances())
+            {
+                await ModalWindow.ShowWarningAsync(owner, new ModalWindowOptions
+                {
+                    Title = title,
+                    Heading = Core.Lang[LangId.Settings_ResetSettings_CloseOtherInstances],
+                });
+                return;
+            }
+
+            var defaults = new Config();
+            if (!await defaults.SaveAsync())
+            {
+                await ModalWindow.ShowSettingsSaveErrorAsync(owner, title);
+                return;
+            }
+
+            App.MainWindow.SkipSettingsSaveOnClose = true;
+            BHelper.RestartApp();
         }
-        catch
+        catch (System.Exception ex)
         {
-            // an async void handler must never reach the unhandled-error dialog
+            await ModalWindow.ShowUnhandledErrorAsync(ex, owner);
         }
     }
 

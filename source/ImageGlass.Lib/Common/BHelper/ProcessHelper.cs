@@ -410,43 +410,16 @@ public partial class BHelper
 
 
     /// <summary>
-    /// Terminates all other running instances of this app, keeping the current process alive.
-    /// </summary>
-    public static void CloseOtherInstances()
-    {
-        try
-        {
-            using var current = Process.GetCurrentProcess();
-            foreach (var proc in Process.GetProcessesByName(current.ProcessName))
-            {
-                try
-                {
-                    if (proc.Id != current.Id) proc.Kill();
-                }
-                catch { }
-                finally { proc.Dispose(); }
-            }
-        }
-        catch { }
-    }
-
-
-    /// <summary>
     /// Restarts the app: releases the single-instance mutex so a fresh instance can take ownership,
     /// launches it, then exits the current process.
     /// </summary>
-    /// <param name="suppressQuickSetup">
-    /// Pass <c>true</c> when restarting out of the Quick Setup wizard so the fresh instance skips
-    /// the forced wizard for that launch (prevents an admin-locked version from looping).
-    /// </param>
-    public static void RestartApp(bool suppressQuickSetup = false)
+    public static void RestartApp()
     {
         // release the single-instance lock; otherwise the new instance would just forward to this
         // (exiting) one and quit, leaving no window
         Core.AppInstance.Dispose();
 
-        IReadOnlyList<string> args = suppressQuickSetup ? [AppCmds.NO_QUICK_SETUP] : [];
-        _ = RunExeAsync(AppRelaunchPath, args);
+        _ = RunExeAsync(AppRelaunchPath);
         ExitApp(false);
     }
 

@@ -59,11 +59,6 @@ public partial class AboutWindow : DialogWindow
           https://github.com/Cysharp/NativeMemoryArray
           Copyright (c) 2021 Cysharp, Inc.
 
-        ◍ NetCoreAudio                                     MIT licence
-          https://github.com/mobiletechtracker/NetCoreAudio
-          Copyright (c) 2020-2024 Fiodar Sazanavets
-                                  (Scientific Programmer Ltd)
-
         ◍ CsWin32                                          MIT licence
           https://github.com/microsoft/CsWin32
           Copyright (c) Microsoft Corporation
@@ -151,11 +146,7 @@ public partial class AboutWindow : DialogWindow
         PART_BtnPrivacy.Text = Core.Lang[LangId._Privacy];
         PART_BtnDonate.Text = "❤️ " + Core.Lang[LangId._Donate];
 
-        // the edition name is not translatable, but the tooltip says what clicking it does
-        ToolTip.SetTip(PART_BtnEdition, Core.Lang[Core.IsProEnabled
-            ? LangId.Menu_MnuManageLicense
-            : LangId.Menu_MnuUpgradeLicense]);
-
+        ToolTip.SetTip(PART_BtnEdition, Core.Lang[LangId.Menu_MnuManageLicense]);
         UpdateVersionText();
     }
 
@@ -205,25 +196,22 @@ public partial class AboutWindow : DialogWindow
 
 
     /// <summary>
-    /// Fills in the edition chip: a filled accent pill for Pro, a plain one for Classic.
+    /// Shows the license management button for Pro.
     /// </summary>
     private void SetupEditionChip()
     {
-        var isPro = Core.IsProEnabled;
+        PART_BtnEdition.IsVisible = Core.IsProEnabled;
+        if (!PART_BtnEdition.IsVisible) return;
 
-        // "Classic" and "Pro" are edition names, not translatable copy
-        PART_BtnEdition.Text = isPro ? "Pro" : "Classic";
-        PART_BtnEdition.Variant = isPro ? PhButtonVariant.Accent : PhButtonVariant.Outline;
+        PART_BtnEdition.Text = "Pro";
+        PART_BtnEdition.Variant = PhButtonVariant.Accent;
 
         // applying the variant clears both, so the pill shape has to be restored after it
         PART_BtnEdition.Padding = new Thickness(14, 2);
         PART_BtnEdition.Cursor = new Cursor(StandardCursorType.Hand);
 
         // the accent variant fills the background but leaves the text colour alone
-        if (isPro)
-        {
-            PART_BtnEdition[!PhButton.ForegroundProperty] = Resx.CreateBinding(ResxId.AccentButtonForeground);
-        }
+        PART_BtnEdition[!PhButton.ForegroundProperty] = Resx.CreateBinding(ResxId.AccentButtonForeground);
 
         // owned by this dialog, not the main window, so it stacks on top of the modal About
         PART_BtnEdition.Click += async (_, _) =>

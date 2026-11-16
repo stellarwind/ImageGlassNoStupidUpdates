@@ -51,7 +51,6 @@ public partial class ManageLicenseView : PhControl
 
         PART_BtnPlan.Click += (_, _) => OpenUrl("https://imageglass.org/license");
         PART_BtnChangeLicense.Click += async (_, _) => await UpgradeToProControl.ImportLicenseAsync(this);
-        PART_BtnUpgradePlan.Click += (_, _) => OpenUrl("https://imageglass.org/pricing");
         PART_BtnExportLicense.Click += async (_, _) => await ExportLicenseAsync();
     }
 
@@ -100,9 +99,9 @@ public partial class ManageLicenseView : PhControl
     /// </summary>
     private void UpdateHeading()
     {
-        var headingId = LangId.Menu_MnuUpgradeLicense;
-        if (Core.IsProEnabled) headingId = LangId.Menu_MnuManageLicense;
-        else if (Core.ExpiredLicense is not null) headingId = LangId.Menu_MnuUpgradeLicense_ExpiredTitle;
+        var headingId = !Core.IsProEnabled && Core.ExpiredLicense is not null
+            ? LangId.Menu_MnuUpgradeLicense_ExpiredTitle
+            : LangId.Menu_MnuManageLicense;
 
         PART_LblHeading.Text = Core.Lang[headingId];
     }
@@ -127,9 +126,8 @@ public partial class ManageLicenseView : PhControl
             ? LicenseService.GetChannelDisplayName(Core.StoreEntitlementProvider?.ChannelId)
             : string.Empty;
 
-        // the store grants the entitlement, so there is no file to swap and no plan to upgrade
+        // the store grants the entitlement, so there is no file to swap
         PART_BtnChangeLicense.IsVisible = !isStoreBuild;
-        PART_BtnUpgradePlan.IsVisible = !isStoreBuild;
 
         var canExport = LicenseService.TryGetExportableLicense(out _, out _);
         PART_BtnExportLicense.IsVisible = canExport;

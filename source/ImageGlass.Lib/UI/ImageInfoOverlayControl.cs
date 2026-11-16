@@ -98,17 +98,7 @@ public class ImageInfoOverlayControl : PhOverlay
     /// <summary>
     /// Gets whether the window hides its title bar, so the image info shows nowhere else.
     /// </summary>
-    public static bool IsTitleBarHidden
-    {
-        get
-        {
-            var isFullScreen = Core.Config.EnableFullScreen;
-            if (isFullScreen) return true;
-
-            var isFrameless = Core.Config.EnableFrameless;
-            return isFrameless;
-        }
-    }
+    public static bool IsTitleBarHidden => Core.Config.EnableFullScreen;
 
 
     /// <summary>
@@ -212,14 +202,11 @@ public class ImageInfoOverlayControl : PhOverlay
     private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var isRelevant = e.PropertyName is nameof(Config.ImageInfoOverlayMode)
-            or nameof(Config.EnableFullScreen)
-            or nameof(Config.EnableFrameless)
-            or nameof(Config.EnableSlideshow);
+            or nameof(Config.EnableFullScreen);
         if (!isRelevant) return;
 
         // a mode switch starts over, so a stale hover cannot keep the bar up
-        var isModeChanged = e.PropertyName is nameof(Config.ImageInfoOverlayMode)
-            or nameof(Config.EnableSlideshow);
+        var isModeChanged = e.PropertyName is nameof(Config.ImageInfoOverlayMode);
 
         Dispatcher.UIThread.Post(() =>
         {
@@ -264,7 +251,6 @@ public class ImageInfoOverlayControl : PhOverlay
 
     private void TopLevel_PointerExited(object? sender, PointerEventArgs e)
     {
-        // e.g. leaving a frameless window over its top edge
         if (!_isHovered) return;
 
         _hideTimer.Start();
@@ -330,15 +316,12 @@ public class ImageInfoOverlayControl : PhOverlay
 
 
     /// <summary>
-    /// Gets whether the bar waits for the pointer to show, which every mode does during a slideshow.
+    /// Gets whether the bar waits for the pointer to show.
     /// </summary>
     private static bool IsAutoHideMode
     {
         get
         {
-            var isSlideshow = Core.Config.EnableSlideshow;
-            if (isSlideshow) return true;
-
             var mode = Core.Config.ImageInfoOverlayMode;
             var isAutoHide = mode is ImageInfoOverlayMode.AlwaysAutoHide or ImageInfoOverlayMode.BorderlessAutoHide;
 

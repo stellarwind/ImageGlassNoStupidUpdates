@@ -263,7 +263,6 @@ public enum ResxId
     IG_ThemeBackgroundBrush,
     IG_ViewerBackgroundBrush,
     IG_ToolHostBackgroundBrush,
-    IG_ProjectorBackgroundBrush,
     IG_ThemeForegroundBrush,
     IG_ThemeToolbarBackgroundBrush,
     IG_ThemeGalleryBackgroundBrush,
@@ -333,11 +332,7 @@ public enum ResxIconId
     IconProStar,
     IconToolColorPicker,
     IconToolCropImage,
-    IconToolFrameNav,
-    IconToolHdrToneMapper,
-    IconToolProjector,
     IconToolImageResizer,
-    IconToolLosslessCompression,
 }
 
 

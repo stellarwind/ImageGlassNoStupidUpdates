@@ -166,12 +166,6 @@ public partial class MainWindow : PhWindow
         // this pass already accepted the close, so nothing below may escape and keep the window open
         try
         {
-            // stop slideshow so pre-slideshow config values are restored before saving
-            Core.API?.IG_ToggleSlideshow(false);
-
-            // the projectors mirror this window; their settings are already in the config
-            ProjectorToolControl.Manager?.CloseAll();
-
             // stop all external tool processes before saving config
             await Core.ToolRegistry.ExternalTools.StopAllAsync();
 
@@ -208,16 +202,6 @@ public partial class MainWindow : PhWindow
             or AutoCompleteBox) return;
 
         // process app hotkeys
-        // press ESC: exit slideshow if it is running
-        var hk = new Hotkey(e);
-        if (hk.IsSame(Key.Escape) && Core.Slideshow?.IsRunning == true)
-        {
-            _ = await Core.API.RunApiAsync(API.IG_ToggleSlideshow, "false");
-            e.Handled = true;
-            return;
-        }
-
-
         await Core.API.HandleKeyDownAsync(e);
         if (e.Handled) return;
     }
@@ -313,7 +297,6 @@ public partial class MainWindow : PhWindow
             Bounds = bounds,
             ShowToolbar = Core.Config.ShowToolbar,
             ShowGallery = Core.Config.ShowGallery,
-            IsFrameless = Core.Config.EnableFrameless,
             IsWindowFit = Core.Config.EnableWindowFit,
         };
     }
@@ -334,7 +317,6 @@ public partial class MainWindow : PhWindow
         Core.Config.EnableMainWindowMaximized = layout.IsMaximized;
         Core.Config.ShowToolbar = layout.ShowToolbar;
         Core.Config.ShowGallery = layout.ShowGallery;
-        Core.Config.EnableFrameless = layout.IsFrameless;
         Core.Config.EnableWindowFit = layout.IsWindowFit;
         if (layout.Bounds is { } bounds) Core.Config.MainWindowBounds = bounds;
 
@@ -356,6 +338,9 @@ public partial class MainWindow : PhWindow
     }
 
 
+    internal bool SkipSettingsSaveOnClose { get; set; }
+
+
     private async Task SaveConfigOnClosingAsync()
     {
         // hide the open windows
@@ -364,7 +349,7 @@ public partial class MainWindow : PhWindow
 
 
         // save config to file
-        var taskConfig = CaptureAndSaveConfigAsync();
+        var taskConfig = SkipSettingsSaveOnClose ? Task.CompletedTask : CaptureAndSaveConfigAsync();
 
 
         // keep our clipboard data after exit; flushing data we don't own fails, and Avalonia retries that for ~1 s

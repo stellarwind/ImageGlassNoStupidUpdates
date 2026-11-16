@@ -18,7 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
@@ -173,21 +172,6 @@ public class PhMenuItem : MenuItem
             Header = $"{localizedText} 🔒";
             Disable();
         }
-        // Pro feature not yet unlocked: badged; disabled unless previewable
-        else if (FeatureManager.IsProGated(LangKey))
-        {
-            Header = new TextBlock
-            {
-                Inlines = new InlineCollection
-                {
-                    new Run(localizedText),
-                    new Run(" ✦") { Foreground = new SolidColorBrush(Core.AccentColor) },
-                },
-            };
-
-            if (FeatureManager.IsProBlocked(LangKey)) Disable();
-            else RestoreEnabled();
-        }
         else
         {
             Header = localizedText;
@@ -197,7 +181,7 @@ public class PhMenuItem : MenuItem
 
 
     /// <summary>
-    /// Disables the item because of a gate (admin lock or Pro), remembering that we did it.
+    /// Disables the item because of an admin lock, remembering that we did it.
     /// </summary>
     private void Disable()
     {

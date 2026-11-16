@@ -177,9 +177,7 @@ public partial class MainWindowView : PhControl
             // set file watcher
             AppAPIProvider.SetFileWatcher(Core.Config.EnableFileWatcher);
         }
-        else if (e.PropertyName is nameof(Config.BackgroundColor)
-            or nameof(Config.SlideshowBackgroundColor)
-            or nameof(Config.EnableSlideshow))
+        else if (e.PropertyName is nameof(Config.BackgroundColor))
         {
             Core.UpdateViewerBackgroundBrushResource();
         }
@@ -527,38 +525,6 @@ public partial class MainWindowView : PhControl
 
         var hasClipboardImage = Core.ClipboardImage != null;
         var imageNotFound = !File.Exists(Core.Photos.CurrentFilePath);
-
-
-        #region Menu group: Slideshow
-        if (Core.Slideshow?.IsRunning == true)
-        {
-            mnuContext.Items.Add(new PhMenuItem
-            {
-                LangKey = LangId._MnuPauseResumeSlideshow,
-                Command = Core.API.GetApiCommand(API.IG_ToggleSlideshowPlayback),
-                HotkeyText = AppAPIProvider.GetMenuHotkeyText(LangId._MnuPauseResumeSlideshow),
-            });
-            mnuContext.Items.Add(new PhMenuItem
-            {
-                LangKey = LangId._MnuExitSlideshow,
-                Command = Core.API.GetApiCommand(API.IG_ToggleSlideshow),
-                CommandParameter = false,
-                HotkeyText = string.Join(", ", [
-                    new Hotkey(Key.Escape),
-                    AppAPIProvider.GetMenuHotkeyText(LangId.Menu_MnuSlideshow)
-                ]),
-            });
-            mnuContext.Items.Add(new PhMenuItem
-            {
-                ToggleType = MenuItemToggleType.CheckBox,
-                IsChecked = Core.Config.EnableSlideshowCountdown,
-                LangKey = LangId._MnuToggleCountdown,
-                Command = Core.API.GetApiCommand(API.IG_ToggleSlideshowCountdown),
-                CommandParameter = !Core.Config.EnableSlideshowCountdown,
-            });
-            mnuContext.Items.Add("-"); //------------
-        }
-        #endregion // Menu group: Slideshow
 
 
         #region Menu group: Layout
@@ -1283,15 +1249,14 @@ public partial class MainWindowView : PhControl
 
 
     /// <summary>
-    /// Shows the motion-video button for a live photo while the Frame nav tool is closed.
+    /// Shows the motion-video button for a live photo.
     /// </summary>
     private void UpdateMotionButtonState()
     {
         var photo = PART_Viewer.Photo;
         var isLivePhoto = photo?.Error is null && (photo?.Metadata?.IsLivePhoto ?? false);
-        var isFrameNavOpen = PART_ToolHost.Tool?.ToolId == FrameNavToolControl.TOOL_ID;
 
-        PART_MotionOverlay.IsShown = isLivePhoto && !isFrameNavOpen;
+        PART_MotionOverlay.IsShown = isLivePhoto;
     }
 
 

@@ -35,7 +35,6 @@ using ImageGlass.UI;
 using ImageGlass.UI.Viewer;
 using ImageGlass.UI.Viewer.Transitions;
 using ImageGlass.UI.Windowing;
-using ImageGlass.Windows;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
@@ -64,16 +63,6 @@ public partial class AppAPIProvider
     // shows the folder switch message once the new folder's photo loads; null when none is pending
     private static TEventHandler<ViewerControl, PhotoLoadingEventArgs>? _siblingDirAnnouncer;
 
-    // slideshow state backup
-    private bool _isFullScreenBeforeSlideshow;
-    private bool _isFramelessBeforeSlideshow;
-    private bool _isWindowFitBeforeSlideshow;
-    private bool _showToolbarBeforeSlideshow = true;
-    private bool _showGalleryBeforeSlideshow = true;
-    private bool _windowMaximizedBeforeSlideshow;
-    private DispatcherTimer? _slideshowCountdownTimer;
-    private IdleCursorHider? _slideshowCursorHider;
-
     /// <summary>
     /// Gets the windowed layout captured on entering full screen, so a session that ends in full
     /// screen still persists the layout to return to; <c>null</c> when not in full screen.
@@ -87,7 +76,6 @@ public partial class AppAPIProvider
     private static PhGridSplitter GalleryResizer => App.MainWindow.PART_MainView.PART_GalleryResizer;
     private static MessageOverlayControl Message => App.MainWindow.PART_MainView.PART_Message;
     private static ToolHostControl ToolHost => App.MainWindow.PART_MainView.PART_ToolHost;
-    private static SlideshowCountdownOverlay SlideshowCountdown => App.MainWindow.PART_MainView.PART_SlideshowCountdown;
 
 
     /// <summary>
@@ -103,16 +91,9 @@ public partial class AppAPIProvider
             new ToolControlAdapter(ColorPickerToolControl.TOOL_ID, v => new ColorPickerToolControl { Viewer = v }));
         Core.ToolRegistry.Register(CropImageToolControl.TOOL_ID,
             new ToolControlAdapter(CropImageToolControl.TOOL_ID, v => new CropImageToolControl { Viewer = v }));
-        Core.ToolRegistry.Register(FrameNavToolControl.TOOL_ID,
-            new ToolControlAdapter(FrameNavToolControl.TOOL_ID, v => new FrameNavToolControl { Viewer = v }));
-        Core.ToolRegistry.Register(HdrToneMapperToolControl.TOOL_ID,
-            new ToolControlAdapter(HdrToneMapperToolControl.TOOL_ID, v => new HdrToneMapperToolControl { Viewer = v }));
-        Core.ToolRegistry.Register(ProjectorToolControl.TOOL_ID,
-            new ToolControlAdapter(ProjectorToolControl.TOOL_ID, v => new ProjectorToolControl { Viewer = v }));
 
         // Register built-in non-hosted plugins
         Core.ToolRegistry.Register(ImageResizerTool.TOOL_ID, new ImageResizerTool());
-        Core.ToolRegistry.Register(LosslessCompressionTool.TOOL_ID, new LosslessCompressionTool());
     }
 
 
@@ -682,11 +663,6 @@ public partial class AppAPIProvider
         using var session = new PrintSession(state);
         var window = new PrintWindow(session, region ?? PrintRegion.WholeImage);
 
-        // a running slideshow would move on to the next photo behind the window
-        var slideshow = Core.Slideshow;
-        var isSlideshowPaused = slideshow is { IsRunning: true, IsPaused: false };
-        if (isSlideshowPaused) slideshow!.Pause();
-
         // a busy app holds the animation still and refuses edits while the window is open
         Core.IsBusy = true;
         try
@@ -696,7 +672,6 @@ public partial class AppAPIProvider
         finally
         {
             Core.IsBusy = false;
-            if (isSlideshowPaused) slideshow!.Resume();
         }
 
         if (window.CompletedMessage is { } message) _ = Message.ShowAsync(message);
@@ -972,15 +947,6 @@ public partial class AppAPIProvider
     /// </summary>
     public void IG_ViewByStep(int step)
     {
-        _ = ViewByStep__(step, isSlideshowAdvance: false);
-    }
-
-
-    /// <summary>
-    /// Views the photo <paramref name="step"/> away; the task completes when its transition finished.
-    /// </summary>
-    private Task ViewByStep__(int step, bool isSlideshowAdvance)
-    {
         // Sequential mode: ignore navigation until the current photo is painted, so holding
         // an arrow key advances one fully-drawn image at a time.
         // must run before GetByStep below, which advances CurrentIndex right away
@@ -991,18 +957,16 @@ public partial class AppAPIProvider
             if (isLoading)
             {
                 PhotoTrace.Mark("nav:blocked-sequential", Core.Photos.CurrentFilePath);
-                return Task.CompletedTask;
+                return;
             }
         }
 
         // check if can navigate to the image
-        var canLoopBack = Core.Config.EnableSlideshow
-            ? Core.Config.EnableLoopSlideshow
-            : Core.Config.EnableLoopBackNavigation;
+        var canLoopBack = Core.Config.EnableLoopBackNavigation;
 
-        // jumping to a sibling folder at the boundary takes precedence over loop-back (not in slideshow),
+        // jumping to a sibling folder at the boundary takes precedence over loop-back,
         // so detect the true boundary first by disabling loop-back for the probe
-        var autoSwitchDir = Core.Config.EnableAutoSwitchSiblingDir && !Core.Config.EnableSlideshow;
+        var autoSwitchDir = Core.Config.EnableAutoSwitchSiblingDir;
 
         var reachedBoundary = !Core.Photos.GetByStep(step, autoSwitchDir ? false : canLoopBack, out var photo);
         if (reachedBoundary && autoSwitchDir)
@@ -1010,7 +974,7 @@ public partial class AppAPIProvider
             // try the sibling directory; if none found, fall back to normal loop-back handling
             var currentDir = Path.GetDirectoryName(Core.Photos.CurrentFilePath);
             var isSiblingDirOpened = TryOpenSiblingDir(currentDir, isNext: step >= 0, selectLastPhoto: step < 0);
-            if (isSiblingDirOpened) return Task.CompletedTask;
+            if (isSiblingDirOpened) return;
             reachedBoundary = !Core.Photos.GetByStep(step, canLoopBack, out photo);
         }
 
@@ -1021,34 +985,25 @@ public partial class AppAPIProvider
             _ = Message.ShowAsync(Core.Lang[isFirst
                 ? LangId._ReachedFirstImage
                 : LangId._ReachedLastImage]);
-            return Task.CompletedTask;
+            return;
         }
 
 
-        var transition = CreateTransitionRequest__(step, isSlideshowAdvance);
+        var transition = CreateTransitionRequest__(step);
         _ = App.MainWindow.PART_MainView.ViewPhotoAsync(photo, transition: transition);
-
-        // reset slideshow interval on manual navigation
-        if (!isSlideshowAdvance) ResetSlideshowInterval__();
-
-        return transition?.Completion ?? Task.CompletedTask;
     }
 
 
     /// <summary>
     /// Creates the transition for a step navigation from the config; <c>null</c> for none.
     /// </summary>
-    private TransitionRequest? CreateTransitionRequest__(int step, bool isSlideshowAdvance)
+    private TransitionRequest? CreateTransitionRequest__(int step)
     {
         // holding an arrow key flips through photos, which a transition would only slow down
         if (IsQuickBrowsing) return null;
 
-        var effectId = isSlideshowAdvance
-            ? Core.Config.SlideshowTransition
-            : Core.Config.NavigationTransition;
-        var durationMs = isSlideshowAdvance
-            ? Core.Config.SlideshowTransitionDuration
-            : Core.Config.NavigationTransitionDuration;
+        var effectId = Core.Config.NavigationTransition;
+        var durationMs = Core.Config.NavigationTransitionDuration;
 
         return TransitionEffects.CreateRequest(effectId, durationMs, step);
     }
@@ -1078,10 +1033,7 @@ public partial class AppAPIProvider
         if (string.IsNullOrEmpty(currentDir)) return;
 
         // none left in that direction: stay on the first/last sibling folder
-        var isSiblingDirOpened = TryOpenSiblingDir(currentDir, isNext, selectLastPhoto: false);
-        if (!isSiblingDirOpened) return;
-
-        ResetSlideshowInterval__();
+        _ = TryOpenSiblingDir(currentDir, isNext, selectLastPhoto: false);
     }
 
 
@@ -1130,26 +1082,6 @@ public partial class AppAPIProvider
 
 
     /// <summary>
-    /// Resumes a paused slideshow and restarts its interval, after a manual navigation.
-    /// </summary>
-    private static void ResetSlideshowInterval__()
-    {
-        if (!Core.Config.EnableSlideshow) return;
-
-        var slideshow = Core.Slideshow;
-        if (slideshow is null) return;
-
-        // resume if auto-paused (e.g. at end of list)
-        if (slideshow.IsPaused)
-        {
-            slideshow.Resume();
-        }
-
-        slideshow.ResetInterval();
-    }
-
-
-    /// <summary>
     /// View the next photo.
     /// </summary>
     public void IG_ViewNext()
@@ -1172,17 +1104,9 @@ public partial class AppAPIProvider
     /// </summary>
     public static void ViewPhotoAfterCurrentRemoved()
     {
-        var canLoopBack = Core.Config.EnableSlideshow
-            ? Core.Config.EnableLoopSlideshow
-            : Core.Config.EnableLoopBackNavigation;
+        var canLoopBack = Core.Config.EnableLoopBackNavigation;
 
         var photo = Core.Photos.SelectReplacementOfCurrent(canLoopBack);
-
-        // an empty list leaves the slideshow ticking against nothing
-        if (photo is null && Core.Config.EnableSlideshow)
-        {
-            Core.API.IG_ToggleSlideshow(false);
-        }
 
         _ = App.MainWindow.PART_MainView.ViewPhotoAsync(photo);
     }
@@ -1237,82 +1161,6 @@ public partial class AppAPIProvider
         IG_ViewByIndex((int)Core.Photos.Count - 1);
     }
 
-
-    /// <summary>
-    /// View a frame of the current photo.
-    /// </summary>
-    public void IG_ViewFrame(string? frameIndexStr)
-    {
-        if (!int.TryParse(frameIndexStr, out var frameIndex))
-        {
-            throw new ArgumentException($"""
-                Frame index '{frameIndexStr}' is not a valid integer.
-
-                ----------
-                👉🏼 Method: {nameof(IG_ViewFrame)}
-                """,
-                nameof(frameIndexStr));
-        }
-
-        IG_ViewFrame(frameIndex);
-    }
-
-
-    /// <summary>
-    /// View a frame of the current photo.
-    /// If the frame index is out of range, it will be looped.
-    /// </summary>
-    public static void IG_ViewFrame(int frameIndex)
-    {
-        var frameCount = Core.Photos.CurrentMetadata?.FrameCount ?? 0;
-        if (frameCount < 2) return;
-
-        var safeFrameIndex = BHelper.ComputeIndexInRange(frameIndex, frameCount, true);
-
-        Dispatcher.UIThread.Post(async () =>
-        {
-            await Viewer.ViewFrameAsync((uint)safeFrameIndex);
-        });
-    }
-
-
-    /// <summary>
-    /// View the next frame of the current photo.
-    /// </summary>
-    public static void IG_ViewNextFrame()
-    {
-        var newFrameIndex = (Core.Photos.Current?.FrameIndex ?? 0) + 1;
-        IG_ViewFrame(newFrameIndex);
-    }
-
-
-    /// <summary>
-    /// View the previous frame of the current photo.
-    /// </summary>
-    public static void IG_ViewPreviousFrame()
-    {
-        var newFrameIndex = (Core.Photos.Current?.FrameIndex ?? 1) - 1;
-        IG_ViewFrame(newFrameIndex);
-    }
-
-
-    /// <summary>
-    /// View the first frame of the current photo.
-    /// </summary>
-    public static void IG_ViewFirstFrame()
-    {
-        IG_ViewFrame(0);
-    }
-
-
-    /// <summary>
-    /// View the last frame of the current photo.
-    /// </summary>
-    public static void IG_ViewLastFrame()
-    {
-        var lastFrameIndex = (int)(Core.Photos.CurrentMetadata?.FrameCount ?? 1) - 1;
-        IG_ViewFrame(lastFrameIndex);
-    }
 
     #endregion // Navigation APIs
 
@@ -2440,7 +2288,7 @@ public partial class AppAPIProvider
         var toolbarPos = Config.GetControlLayout(LayoutControl.Toolbar);
         var galleryPos = Config.GetControlLayout(LayoutControl.Gallery);
 
-        var frameSize = Core.Config.EnableFrameless ? new() : new Size(2, 32);
+        var frameSize = new Size(2, 32);
         var gapW = 0d;
         var gapH = Toolbar.Bounds.Height;
 
@@ -2536,74 +2384,6 @@ public partial class AppAPIProvider
 
 
     /// <summary>
-    /// Toggles frameless mode.
-    /// </summary>
-    /// <param name="boolStr">Values: <c>"true"</c>, <c>"false"</c> or empty.</param>
-    public void IG_ToggleFrameless(string? boolStr = null)
-    {
-        var enabled = BHelper.ConvertStringToBool(boolStr);
-        IG_ToggleFrameless(enabled);
-    }
-
-
-    /// <summary>
-    /// Toggles frameless mode.
-    /// </summary>
-    public void IG_ToggleFrameless(bool? enabled = null)
-    {
-        if (BHelper.OS == OSType.Linux)
-        {
-            throw new NotSupportedException($"IGE: This feature is not supported on {BHelper.OS}.");
-        }
-
-
-        enabled ??= !Core.Config.EnableFrameless;
-
-        // set frameless mode
-        SetFramelessMode__(enabled.Value, true);
-    }
-    private void SetFramelessMode__(bool enabled, bool showMessage)
-    {
-        Core.Config.EnableFrameless = enabled;
-
-
-        // set frameless mode
-        if (enabled)
-        {
-            // exit full screen
-            if (Core.Config.EnableFullScreen) IG_ToggleFullScreen(false);
-
-            App.MainWindow.IsFrameless = true;
-        }
-
-        // restore frame
-        else
-        {
-            App.MainWindow.IsFrameless = false;
-        }
-
-
-        // update window fit
-        if (Core.Config.EnableWindowFit)
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                ApplyWindowFitMode(!Viewer.IsManualZoom);
-            });
-        }
-
-
-        // show message
-        if (showMessage && enabled)
-        {
-            _ = Message.ShowAsync(
-                Core.Lang[LangId.Menu_MnuFrameless_EnableDescription],
-                Core.Lang[LangId.Menu_MnuFrameless]);
-        }
-    }
-
-
-    /// <summary>
     /// Toggles fullscreen mode.
     /// </summary>
     /// <param name="boolStr">Values: <c>"true"</c>, <c>"false"</c> or empty.</param>
@@ -2631,11 +2411,10 @@ public partial class AppAPIProvider
         if (enabled)
         {
             // back up the windowed layout before anything below writes over it in Config
-            _preFullScreenLayout ??= CapturePreFullScreenLayout__();
+            _preFullScreenLayout ??= App.MainWindow.CaptureWindowLayout();
 
-            // exit window fit & frameless; the backup brings them back
+            // exit window fit; the backup brings them back
             if (Core.Config.EnableWindowFit) IG_ToggleWindowFit(false);
-            if (Core.Config.EnableFrameless) SetFramelessMode__(false, false);
 
 
             // enable fullscreen
@@ -2667,29 +2446,9 @@ public partial class AppAPIProvider
                 : WindowState.Normal;
 
 
-            // restore frameless, window fit mode when exiting full screen
-            if (layout.IsFrameless) SetFramelessMode__(true, false);
-
             // window fit measures the toolbar & gallery, whose visibility change is still queued
             if (layout.IsWindowFit) Dispatcher.UIThread.Post(() => IG_ToggleWindowFit(true));
         }
-    }
-
-
-    /// <summary>
-    /// Captures the layout to return to when full screen mode is turned off. A running slideshow
-    /// has already hidden the toolbar &amp; gallery in Config, so take its backup of them instead.
-    /// </summary>
-    private WindowLayoutSnapshot CapturePreFullScreenLayout__()
-    {
-        var layout = App.MainWindow.CaptureWindowLayout();
-        if (!Core.Config.EnableSlideshow) return layout;
-
-        return layout with
-        {
-            ShowToolbar = _showToolbarBeforeSlideshow,
-            ShowGallery = _showGalleryBeforeSlideshow,
-        };
     }
 
 
@@ -2702,215 +2461,9 @@ public partial class AppAPIProvider
         Bounds = Core.Config.MainWindowBounds,
         ShowToolbar = Core.Config.ShowToolbar,
         ShowGallery = Core.Config.ShowGallery,
-        IsFrameless = Core.Config.EnableFrameless,
         IsWindowFit = Core.Config.EnableWindowFit,
     };
 
-
-    /// <summary>
-    /// Toggles slideshow mode.
-    /// </summary>
-    /// <param name="boolStr">Values: <c>"true"</c>, <c>"false"</c> or empty.</param>
-    public void IG_ToggleSlideshow(string? boolStr = null)
-    {
-        var enabled = BHelper.ConvertStringToBool(boolStr);
-        IG_ToggleSlideshow(enabled);
-    }
-
-
-    /// <summary>
-    /// Toggles slideshow mode.
-    /// </summary>
-    public void IG_ToggleSlideshow(bool? enabled = null)
-    {
-        enabled ??= !Core.Config.EnableSlideshow;
-
-        if (enabled.Value)
-        {
-            StartSlideshow__();
-        }
-        else
-        {
-            StopSlideshow__();
-        }
-    }
-    private void StartSlideshow__()
-    {
-        if (Core.Config.EnableSlideshow) return;
-        if (Core.Photos.Count == 0) return;
-
-        // 1. back up current window state
-        _isFullScreenBeforeSlideshow = Core.Config.EnableFullScreen;
-        _isFramelessBeforeSlideshow = Core.Config.EnableFrameless;
-        _isWindowFitBeforeSlideshow = Core.Config.EnableWindowFit;
-        _showToolbarBeforeSlideshow = Core.Config.ShowToolbar;
-        _showGalleryBeforeSlideshow = Core.Config.ShowGallery;
-        _windowMaximizedBeforeSlideshow = App.MainWindow.WindowState == WindowState.Maximized;
-
-
-        // 2. enter full screen if configured
-        if (Core.Config.EnableFullscreenSlideshow && !Core.Config.EnableFullScreen)
-        {
-            // back it up like a normal full screen entry, so leaving full screen mid-slideshow
-            // (or quitting from it) still has a windowed layout to return to
-            _preFullScreenLayout = CapturePreFullScreenLayout__();
-
-            // exit window fit and frameless first
-            if (Core.Config.EnableWindowFit) IG_ToggleWindowFit(false);
-            if (Core.Config.EnableFrameless) SetFramelessMode__(false, false);
-
-            App.MainWindow.WindowState = WindowState.FullScreen;
-            Core.Config.EnableFullScreen = true;
-        }
-
-        // hide toolbar and gallery
-        IG_ToggleToolbar(false);
-        _ = IG_ToggleGalleryAsync(false);
-
-
-        // 3. create and start the slideshow service
-        var slideshow = new SlideshowProvider();
-        slideshow.NextPhotoRequested += OnSlideshowNextPhoto__;
-        Core.Slideshow = slideshow;
-
-        Core.Config.EnableSlideshow = true;
-        slideshow.Start();
-
-
-        // 4. start countdown refresh timer for the viewer overlay
-        SetSlideshowCountdown(Core.Config.EnableSlideshowCountdown);
-
-
-        // 5. auto-hide the idle cursor; the viewer is listed since its own cursor shadows the window's
-        _slideshowCursorHider?.Dispose();
-        _slideshowCursorHider = new IdleCursorHider(App.MainWindow, Viewer);
-        _slideshowCursorHider.Start();
-    }
-
-    private void StopSlideshow__()
-    {
-        if (!Core.Config.EnableSlideshow) return;
-
-        Core.Config.EnableSlideshow = false;
-
-        // 1. stop countdown timer and bring the mouse cursor back
-        SetSlideshowCountdown(false);
-
-        _slideshowCursorHider?.Dispose();
-        _slideshowCursorHider = null;
-
-
-        // 2. stop and dispose the slideshow service
-        if (Core.Slideshow is { } service)
-        {
-            service.NextPhotoRequested -= OnSlideshowNextPhoto__;
-            service.Dispose();
-            Core.Slideshow = null;
-        }
-
-        // free the look-ahead no later pass would unload, but spare the shown photo: its Bitmap may be a live animator
-        if (!Core.Photos.IsCachingEnabled)
-        {
-            Core.Photos.ClearCache(Viewer.Photo);
-        }
-
-
-        // 3. restore window state
-        if (Core.Config.EnableFullscreenSlideshow && !_isFullScreenBeforeSlideshow)
-        {
-            Core.Config.EnableFullScreen = false;
-            _preFullScreenLayout = null;
-
-            Core.Config.EnableMainWindowMaximized = _windowMaximizedBeforeSlideshow;
-            App.MainWindow.WindowState = _windowMaximizedBeforeSlideshow
-                ? WindowState.Maximized
-                : WindowState.Normal;
-        }
-
-        // restore toolbar and gallery
-        IG_ToggleToolbar(_showToolbarBeforeSlideshow);
-        _ = IG_ToggleGalleryAsync(_showGalleryBeforeSlideshow);
-
-        // restore frameless and window fit
-        if (_isFramelessBeforeSlideshow) SetFramelessMode__(true, false);
-        if (_isWindowFitBeforeSlideshow) IG_ToggleWindowFit(true);
-    }
-
-    private Task OnSlideshowNextPhoto__()
-    {
-        return ViewByStep__(1, isSlideshowAdvance: true);
-    }
-
-
-
-    /// <summary>
-    /// Toggle slideshow countdown.
-    /// </summary>
-    /// <param name="boolStr">Values: <c>"true"</c>, <c>"false"</c> or empty.</param>
-    public void IG_ToggleSlideshowCountdown(string? boolStr = null)
-    {
-        var enabled = BHelper.ConvertStringToBool(boolStr);
-        IG_ToggleSlideshowCountdown(enabled);
-    }
-
-
-    /// <summary>
-    /// Toggle slideshow countdown.
-    /// </summary>
-    public void IG_ToggleSlideshowCountdown(bool? enabled = null)
-    {
-        enabled ??= !Core.Config.EnableSlideshowCountdown;
-        Core.Config.EnableSlideshowCountdown = enabled.Value;
-
-        SetSlideshowCountdown(enabled.Value);
-    }
-    private void SetSlideshowCountdown(bool enabled)
-    {
-        if (enabled)
-        {
-            // start countdown timer
-            _slideshowCountdownTimer = new DispatcherTimer(
-                TimeSpan.FromMilliseconds(100),
-                DispatcherPriority.Render,
-                (_, _) => SlideshowCountdown.InvalidateVisual());
-            _slideshowCountdownTimer.Start();
-        }
-        else
-        {
-            // stop countdown timer
-            _slideshowCountdownTimer?.Stop();
-            _slideshowCountdownTimer = null;
-            SlideshowCountdown.InvalidateVisual();
-        }
-    }
-
-
-    /// <summary>
-    /// Plays or pauses the current slideshow.
-    /// </summary>
-    /// <param name="boolStr">Values: <c>"true"</c>, <c>"false"</c> or empty.</param>
-    public static void IG_ToggleSlideshowPlayback(string? boolStr = null)
-    {
-        var enabled = BHelper.ConvertStringToBool(boolStr);
-        IG_ToggleSlideshowPlayback(enabled);
-    }
-
-
-    /// <summary>
-    /// Plays or pauses the current slideshow.
-    /// </summary>
-    public static void IG_ToggleSlideshowPlayback(bool? enabled = null)
-    {
-        if (Core.Slideshow?.IsRunning != true) return;
-        var isPaused = Core.Slideshow?.IsPaused ?? false;
-
-        if (isPaused) Core.Slideshow?.Resume();
-        else Core.Slideshow?.Pause();
-
-        _ = Message.ShowAsync(Core.Lang[isPaused
-            ? LangId._ResumeSlideshow
-            : LangId._PauseSlideshow]);
-    }
 
     #endregion // Window Modes APIs
 
@@ -3067,11 +2620,7 @@ public partial class AppAPIProvider
         if (string.IsNullOrEmpty(hexColor))
         {
             var oldColor = Resx.Get<SolidColorBrush>(ResxId.IG_ViewerBackgroundBrush).Color;
-            var defaultColor = Core.Config.EnableSlideshow
-                ? Colors.Black
-                : Const.COLOR_EMPTY;
-
-            var cp = new PhColorPickerDialog(oldColor, defaultColor)
+            var cp = new PhColorPickerDialog(oldColor, Const.COLOR_EMPTY)
             {
                 Title = Core.Lang[LangId.Menu_MnuChangeBackgroundColor],
             };
@@ -3090,15 +2639,7 @@ public partial class AppAPIProvider
         if (newColor == null) return;
 
 
-        // 3. set background color
-        if (Core.Config.EnableSlideshow)
-        {
-            Core.Config.SlideshowBackgroundColor = newColor.Value.ToHex();
-        }
-        else
-        {
-            Core.Config.BackgroundColor = newColor.Value.ToHex();
-        }
+        Core.Config.BackgroundColor = newColor.Value.ToHex();
     }
 
     #endregion // Layout APIs
@@ -3323,16 +2864,6 @@ public partial class AppAPIProvider
     public static async Task IG_ManageLicenseAsync()
     {
         var dialog = new ManageLicenseWindow();
-        _ = await dialog.ShowAsync(App.MainWindow);
-    }
-
-
-    /// <summary>
-    /// Opens the "ImageGlass Quick Setup" wizard window.
-    /// </summary>
-    public static async Task IG_QuickSetupAsync()
-    {
-        var dialog = new QuickSetupWindow();
         _ = await dialog.ShowAsync(App.MainWindow);
     }
 

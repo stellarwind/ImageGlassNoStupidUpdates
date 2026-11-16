@@ -607,13 +607,6 @@ public class Lang
         new(LangId._Credits, "Credits"),
         new(LangId._Donate, "Donate"),
 
-        // slideshow
-        new(LangId._PauseSlideshow, "Slideshow is paused." ), // v9.0
-        new(LangId._ResumeSlideshow, "Slideshow is resumed." ), // v9.0
-        new(LangId._MnuPauseResumeSlideshow, "Pause/resume slideshow" ), // v9.0
-        new(LangId._MnuToggleCountdown, "Show slideshow countdown" ), // v9.0
-        new(LangId._MnuExitSlideshow, "Exit slideshow" ), // v9.0
-
         // export frames
         new(LangId._Title, "Export image frames" ), //v9.0
         new(LangId._FolderPickerTitle, "Select output folder for exporting image frames" ), //v9.0
@@ -753,10 +746,6 @@ public class Lang
         new(LangId.Menu_MnuGoToFirst, "Go to first image"), //v3.0
         new(LangId.Menu_MnuGoToLast, "Go to last image"), //v3.0
 
-        new(LangId.Menu_MnuViewNextFrame, "View next frame"),
-        new(LangId.Menu_MnuViewPreviousFrame, "View previous frame"),
-        new(LangId.Menu_MnuViewFirstFrame, "View first frame"),
-        new(LangId.Menu_MnuViewLastFrame, "View last frame"),
         #endregion // Main Menu > Navigation
 
         #region Main Menu > Zoom
@@ -834,9 +823,6 @@ public class Lang
 
         new(LangId.Menu_MnuWindowFit, "Window Fit"), //v7.5
         new(LangId.Menu_MnuFullScreen, "Full Screen"), //v3.0
-        new(LangId.Menu_MnuFrameless, "Frameless"), //v7.5
-        new(LangId.Menu_MnuFrameless_EnableDescription, "Drag the top area to move the window"), // v7.5
-        new(LangId.Menu_MnuSlideshow, "Slideshow"), //v3.0
 
         #region Main Menu > Layout
         new(LangId.Menu_MnuLayout, "Layout"), //v3.0
@@ -854,32 +840,18 @@ public class Lang
         new(LangId.Menu_MnuColorPicker, "Color picker"), //v5.0
         new(LangId.Menu_MnuCropTool, "Crop image"), // v7.6
         new(LangId.Menu_MnuResizeTool, "Resize image"), // v9.2
-        new(LangId.Menu_MnuFrameNav, "Frame navigation"), // v7.5
-        new(LangId.Menu_MnuHdrToneMapper, "HDR tone mapper"), // v10.0
-        new(LangId.Menu_MnuProjector, "Projector"), // v10.0
         new(LangId.Menu_MnuToolsSettings, "Tools settings…"),
 
-        new(LangId.Menu_MnuLosslessCompression, "Magick.NET Lossless Compression"), // v9.1
-        new(LangId.Menu_MnuLosslessCompression_Confirm, "Are you sure you want to proceed?"), // v9.1
-        new(LangId.Menu_MnuLosslessCompression_Description, "This tool uses Magick.NET library for lossless compression, optimizing file size. Overwrites only if the compressed file is smaller than the original."), // v9.1
-        new(LangId.Menu_MnuLosslessCompression_Compressing, "Performing lossless compression…"), // v9.1
-        new(LangId.Menu_MnuLosslessCompression_Done, "Done lossless compression."), // v9.1
-        new(LangId.Menu_MnuLosslessCompression_Error, "Could not compress the file."), // v10.0
         #endregion // Main Menu > Tools
 
-        new(LangId.Menu_MnuPlugins, "Plugins"), // v10.0
         new(LangId.Menu_MnuSettings, "Settings"), // v3.0
 
         #region Main Menu > Help
         new(LangId.Menu_MnuHelp, "Help"), //v7.0
         new(LangId.Menu_MnuAbout, "About"), //v3.0
 
-        new(LangId.Menu_MnuUpgradeLicense, "Upgrade to Pro"), // v10.0
-        new(LangId.Menu_MnuUpgradeLicense_Description, "Get the most out of ImageGlass. Pro unlocks advanced tools, smoother workflows, and priority support."), // v10.0
         new(LangId.Menu_MnuUpgradeLicense_ImportLicense, "Import license file…"), // v10.0
         new(LangId.Menu_MnuUpgradeLicense_RetrieveFromEmail, "Retrieve from email…"), // v10.0
-        new(LangId.Menu_MnuUpgradeLicense_BuyOnline, "Buy online…"), // v10.0
-        new(LangId.Menu_MnuUpgradeLicense_ViewFeatures, "View Pro features"), // v10.0
         new(LangId.Menu_MnuUpgradeLicense_OutOfScope, "Your {0} license covers ImageGlass {1}, not ImageGlass {2}. Upgrade your license to turn Pro back on."), // v10.0
         new(LangId.Menu_MnuUpgradeLicense_Expired, "Your {0} license expired on {1}, and ImageGlass has switched to the Classic edition. Purchase a new license or import a renewal to reactivate Pro features."), // v10.0
         new(LangId.Menu_MnuUpgradeLicense_ExpiredTitle, "Your license is expired"), // v10.0
@@ -887,7 +859,6 @@ public class Lang
 
         new(LangId.Menu_MnuManageLicense, "Manage license"), // v10.0
         new(LangId.Menu_MnuManageLicense_ChangeLicense, "Change license file…"), // v10.0
-        new(LangId.Menu_MnuManageLicense_UpgradePlan, "Upgrade plan…"), // v10.0
         new(LangId.Menu_MnuManageLicense_LicensedTo, "Licensed to"), // v10.0
         new(LangId.Menu_MnuManageLicense_Plan, "Plan"), // v10.0
         new(LangId.Menu_MnuManageLicense_Seats, "Seats"), // v10.0
@@ -904,7 +875,6 @@ public class Lang
         new(LangId.Menu_MnuManageLicense_ExportSuccess, "License file saved."), // v10.0
         new(LangId.Menu_MnuManageLicense_ExportFailed, "Could not save the license file."), // v10.0
 
-        new(LangId.Menu_MnuQuickSetup, "Open ImageGlass Quick Setup"), //v9.0
         new(LangId.Menu_MnuReportIssue, "Report an issue…"), //v3.0
 
 
@@ -927,6 +897,8 @@ public class Lang
         #region Settings
 
         new(LangId.Settings_ResetSettings, "Reset settings"), // v9.1
+        new(LangId.Settings_ResetSettings_Confirm, "Reset your settings to defaults and restart ImageGlass?"),
+        new(LangId.Settings_ResetSettings_CloseOtherInstances, "Close other ImageGlass windows before resetting settings."),
         new(LangId.Settings_UnmanagedSettingReminder, "This is an unmanaged setting, it writes registry entries or files that are not cleaned up automatically. You will need to manually disable it before you uninstall the app."), // v9.1
         new(LangId.Settings_SearchPlaceholder, "Search settings…"), // v10.0
         new(LangId.Settings_AdminLockWarning, "Some settings are managed by your administrator and can't be changed here."), // v10.0
@@ -936,7 +908,6 @@ public class Lang
         #region Settings > Navbar
         new(LangId.Settings_Nav_General, "General"),
         new(LangId.Settings_Nav_Image, "Image"),
-        new(LangId.Settings_Nav_Slideshow, "Slideshow"),
         new(LangId.Settings_Nav_Edit, "Edit"),
         new(LangId.Settings_Nav_Viewer, "Viewer"),
         new(LangId.Settings_Nav_Toolbar, "Toolbar"),
@@ -946,7 +917,6 @@ public class Lang
         new(LangId.Settings_Nav_Keyboard, "Keyboard"),
         new(LangId.Settings_Nav_FileTypeAssociations, "File type associations"),
         new(LangId.Settings_Nav_Tools, "Tools"),
-        new(LangId.Settings_Nav_Plugins, "Plugins"),
         new(LangId.Settings_Nav_Language, "Language"),
         new(LangId.Settings_Nav_Appearance, "Appearance"),
         #endregion // Settings > Navbar
@@ -1017,29 +987,13 @@ public class Lang
         #endregion // Settings > Tab Image
 
 
-        #region Settings > Tab Slideshow
-        // Slideshow > Appearance
-        new(LangId.Settings_Slideshow_Appearance, "Appearance"),
-        new(LangId.Settings_EnableSlideshowCountdown, "Show slideshow countdown"),
-        new(LangId.Settings_EnableFullscreenSlideshow, "Start slideshow in Full Screen mode"),
-
-        // Slideshow > Playback
-        new(LangId.Settings_Slideshow_Playback, "Playback"),
-        new(LangId.Settings_EnableLoopSlideshow, "Loop back to the first image when reaching the end of the slideshow"),
-        new(LangId.Settings_EnableSlideshowRandomInterval, "Use random interval"),
-        new(LangId.Settings_SlideshowInterval, "Slideshow interval:"),
-        new(LangId.Settings_SlideshowInterval_From, "From"),
-        new(LangId.Settings_SlideshowInterval_To, "To"),
-
-        new(LangId.Settings_SlideshowImagesToNotifySound, "Number of images to trigger a notification sound"),
-
-        // Slideshow > Transition (shared with Image > Browsing)
+        #region Navigation transitions
         new(LangId.Settings_TransitionEffect, "Transition effect"),
         new(LangId.Settings_TransitionDuration, "Duration (milliseconds)"),
         new(LangId.Settings_TransitionCompileError, "This effect cannot be used:"),
         new(LangId.Settings_OpenTransitionsFolder, "Open transition effects folder"),
         new(LangId.Settings_GetMoreTransitionEffects, "Get more effects…"),
-        #endregion // Settings > Tab Slideshow
+        #endregion // Navigation transitions
 
 
         #region Settings > Tab Edit
@@ -1212,28 +1166,6 @@ public class Lang
 
 
         #region Settings > Tab Plugins
-        new(LangId.Settings_Plugins_OpenPluginFolder, "Open plugin folder"),
-        new(LangId.Settings_Plugins_GetMorePlugins, "Get more plugins…"),
-        new(LangId.Settings_Plugins_SupportedExtensions, "Supported extensions"),
-        new(LangId.Settings_Plugins_ViewMetadata, "Plugin information"),
-        new(LangId.Settings_Plugins_FolderPath, "Folder"),
-        new(LangId.Settings_Plugins_InstallSuccess, "Plugin installed successfully"),
-        new(LangId.Settings_Plugins_DeleteConfirm, "Delete this plugin? This permanently removes it from ImageGlass."),
-        new(LangId.Settings_Plugins_Status, "Status"),
-        new(LangId.Settings_Plugins_Enable, "Enable"),
-        new(LangId.Settings_Plugins_TrustAndEnable, "Trust and enable"),
-        new(LangId.Settings_Plugins_StatusEnabled, "Enabled"),
-        new(LangId.Settings_Plugins_StatusDisabled, "Disabled"),
-        new(LangId.Settings_Plugins_StatusUntrusted, "Not enabled"),
-        new(LangId.Settings_Plugins_StatusChanged, "File changed"),
-        new(LangId.Settings_Plugins_StatusNotLoaded, "Not loaded"),
-        new(LangId.Settings_Plugins_TrustTitle, "Enable this plugin?"),
-        new(LangId.Settings_Plugins_TrustPrompt, "\"{0}\" is a native plugin that runs inside ImageGlass with full access to your files and system. Only enable plugins you obtained from a source you trust."),
-        new(LangId.Settings_Plugins_TrustChangedWarning, "This plugin's file has changed since it was last enabled. Only re-enable it if you updated the plugin yourself."),
-        new(LangId.Settings_Plugins_EnableToLoad, "Enable the plugin below to load it."),
-        new(LangId.Settings_Plugins_ExtensionsHint, "This plugin can open and save the file types below. Turn off any you would rather leave to ImageGlass or another plugin."),
-        new(LangId.Settings_Plugins_FormatsAfterEnable, "Enable this plugin to see and choose the file types it supports."),
-        new(LangId.Settings_Plugins_NoFormats, "No file types supported."),
         #endregion // Settings > Tab Plugins
 
 
@@ -1293,33 +1225,6 @@ public class Lang
         new(LangId.Tool_Crop_DefaultSelectionType_CustomArea, "Custom area…"), //v9.0
 
         #endregion // Tool: Crop
-
-
-        #region Tool: HDR tone mapper
-        new(LangId.Tool_Hdr_LblMode, "Mode"), //v10.0
-        new(LangId.Tool_Hdr_LblExposure, "Exposure: {0}"), //v10.0
-        new(LangId.Tool_Hdr_LblReferenceWhite, "Reference white: {0} nits"), //v10.0
-        new(LangId.Tool_Hdr_LblHighlightCompression, "Highlight compression: {0}"), //v10.0
-        new(LangId.Tool_Hdr_LblSaturation, "Saturation: {0}"), //v10.0
-        new(LangId.Tool_Hdr_BtnReset, "Reset"), //v10.0
-        #endregion // Tool: HDR tone mapper
-
-
-        #region Tool: Projector
-        new(LangId.Tool_Projector_WindowTitle, "Projector {0}"), //v10.0
-        new(LangId.Tool_Projector_BtnAdd, "Add projector"), //v10.0
-        new(LangId.Tool_Projector_ChkSyncView, "Sync projectors with main window"), //v10.0
-        new(LangId.Tool_Projector_ChkShowPointer, "Highlight cursor on projectors"), //v10.0
-        new(LangId.Tool_Projector_ModeFullScreen, "Full screen"), //v10.0
-        new(LangId.Tool_Projector_ModeMaximized, "Maximized"), //v10.0
-        new(LangId.Tool_Projector_ModeNormal, "Window"), //v10.0
-        new(LangId.Tool_Projector_ModeTiled, "Tiled"), //v10.0
-        new(LangId.Tool_Projector_LblLayout, "Layout on screen {0}"), //v10.0
-        new(LangId.Tool_Projector_Monitor, "Monitor {0}"), //v10.0
-        new(LangId.Tool_Projector_DragHint, "Drag onto a monitor to move the projector there"), //v10.0
-        new(LangId.Tool_Projector_ScreenInfo, "Screen {0}: {1}×{2} pixels, {3}% scale"), //v10.0
-        new(LangId.Tool_Projector_MainWindow, "Main window"), //v10.0
-        #endregion // Tool: Projector
 
 
         #region Tool: Color picker
@@ -1397,26 +1302,6 @@ public class Lang
         #endregion // Print
 
 
-        #region Quick setup
-
-        new(LangId.QuickSetup_Title, "ImageGlass Quick Setup" ), //v10.0
-        new(LangId.QuickSetup_StepInfo, "Step {0} of {1}" ), //v10.0
-        new(LangId.QuickSetup_SkipAndLaunch, "Skip this and launch ImageGlass" ), //v10.0
-
-        new(LangId.QuickSetup_SelectLanguage, "Display language" ), //v10.0
-        new(LangId.QuickSetup_SeeWhatNew, "See what's new in this version…" ), //v10.0
-        new(LangId.QuickSetup_SelectProfile, "Select a profile" ), //v10.0
-        new(LangId.QuickSetup_StandardUser, "Standard user" ), //v10.0
-        new(LangId.QuickSetup_ProfessionalUser, "Professional user" ), //v10.0
-        new(LangId.QuickSetup_SettingsWillBeApplied, "Settings will be applied:" ), //v10.0
-        new(LangId.QuickSetup_SettingProfileDescription, "To modify these settings later, simply open the app Settings." ), //v10.0
-
-        new(LangId.QuickSetup_RegisterImageFormats, "Do you want to register the supported image formats of ImageGlass with Windows? You can unregister it later in Settings > File type associations." ), //v10.0
-
-        new(LangId.QuickSetup_ConfirmCloseProcess, "Are you ready to apply the settings?" ), //v10.0
-        new(LangId.QuickSetup_ConfirmCloseProcess_Description, "All other running instances of ImageGlass will be closed before the settings are saved." ), //v10.0
-
-        #endregion // Quick setup
 
 
     ];

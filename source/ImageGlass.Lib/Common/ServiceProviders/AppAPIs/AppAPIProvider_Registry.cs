@@ -62,11 +62,6 @@ public partial class AppAPIProvider
         { API.IG_Goto,                  PhCommands.Create(IG_GoToAsync) },
         { API.IG_GotoFirst,             PhCommands.Create(IG_GoToFirst) },
         { API.IG_GotoLast,              PhCommands.Create(IG_GoToLast) },
-        { API.IG_ViewFrame,             PhCommands.Create(IG_ViewFrame) },
-        { API.IG_ViewNextFrame,         PhCommands.Create(IG_ViewNextFrame) },
-        { API.IG_ViewPreviousFrame,     PhCommands.Create(IG_ViewPreviousFrame) },
-        { API.IG_ViewFirstFrame,        PhCommands.Create(IG_ViewFirstFrame) },
-        { API.IG_ViewLastFrame,         PhCommands.Create(IG_ViewLastFrame) },
 
         { API.IG_ViewByStep,            PhCommands.Create(IG_ViewByStep) },
         { API.IG_ViewByIndex,           PhCommands.Create(IG_ViewByIndex) },
@@ -122,11 +117,7 @@ public partial class AppAPIProvider
 
         // Window modes
         { API.IG_ToggleWindowFit,           PhCommands.Create(IG_ToggleWindowFit) },
-        { API.IG_ToggleFrameless,           PhCommands.Create(IG_ToggleFrameless) },
         { API.IG_ToggleFullScreen,          PhCommands.Create(IG_ToggleFullScreen) },
-        { API.IG_ToggleSlideshow,           PhCommands.Create(IG_ToggleSlideshow) },
-        { API.IG_ToggleSlideshowPlayback,   PhCommands.Create(IG_ToggleSlideshowPlayback) },
-        { API.IG_ToggleSlideshowCountdown,  PhCommands.Create(IG_ToggleSlideshowCountdown) },
 
 
         // Layout
@@ -152,7 +143,6 @@ public partial class AppAPIProvider
         { API.IG_OpenAboutWindow,           PhCommands.Create(IG_OpenAboutWindowAsync) },
         { API.IG_ManageLicense,             PhCommands.Create(IG_ManageLicenseAsync) },
         { API.IG_ReportIssue,               PhCommands.Create(IG_ReportIssue) },
-        { API.IG_QuickSetup,                PhCommands.Create(IG_QuickSetupAsync) },
         { API.IG_SetDefaultPhotoViewer,     PhCommands.Create(IG_SetDefaultPhotoViewerAsync) },
         { API.IG_RemoveDefaultPhotoViewer,  PhCommands.Create(IG_RemoveDefaultPhotoViewerAsync) },
 
@@ -344,15 +334,6 @@ public partial class AppAPIProvider
     public async Task<Exception?> RunActionAsync(SingleAction? ac, bool showError, string? customArg = null)
     {
         if (string.IsNullOrWhiteSpace(ac?.Executable)) return null;
-
-
-        // route a blocked Pro feature to the upgrade prompt instead of running it (hotkey, toolbar
-        // and menu; startup-restore/IPC go through RunApiAsync)
-        if (FeatureManager.IsProBlocked(Lang.GetKey(ac.LangKey)))
-        {
-            _ = await RunApiAsync(API.IG_ManageLicense);
-            return null;
-        }
 
 
         // 1. run the current action

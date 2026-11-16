@@ -221,7 +221,7 @@ public partial class ViewerControl
 
     private void MirrorSource_TransitionStarting(ViewerControl sender, TransitionRequest? request)
     {
-        // a copy, as only the request of the source tells the slideshow when its effect ended
+        // Clone the request so the source and mirror track their own completion.
         var ownRequest = request is null
             ? null
             : new TransitionRequest(request.Effect, request.DurationMs, request.Direction);

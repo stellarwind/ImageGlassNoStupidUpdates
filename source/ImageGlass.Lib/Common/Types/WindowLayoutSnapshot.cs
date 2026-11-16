@@ -23,7 +23,7 @@ namespace ImageGlass.Common.Types;
 
 /// <summary>
 /// The windowed layout of the main window, i.e. the state to return to when full screen mode is
-/// turned off. Full screen hides the toolbar and gallery and drops frameless and window fit
+/// turned off. Full screen hides the toolbar and gallery and drops window fit
 /// through <c>Config</c>, so the value captured on entry is also what gets persisted, keeping the
 /// saved config a description of the windowed layout rather than the full screen one.
 /// </summary>
@@ -48,11 +48,6 @@ public readonly record struct WindowLayoutSnapshot
     /// Whether the gallery was visible.
     /// </summary>
     public bool ShowGallery { get; init; }
-
-    /// <summary>
-    /// Whether frameless mode was on.
-    /// </summary>
-    public bool IsFrameless { get; init; }
 
     /// <summary>
     /// Whether window fit mode was on.

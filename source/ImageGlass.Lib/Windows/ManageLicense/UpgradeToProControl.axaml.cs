@@ -28,8 +28,7 @@ using System.Threading.Tasks;
 namespace ImageGlass.Common.Windows;
 
 /// <summary>
-/// The Pro upgrade pitch: description, feature-comparison link and the buy / import / retrieve
-/// actions. Shared by the Manage-license window and the Quick Setup wizard.
+/// Imports or retrieves a Pro license and reports its status.
 /// </summary>
 public partial class UpgradeToProControl : PhControl
 {
@@ -39,74 +38,14 @@ public partial class UpgradeToProControl : PhControl
     public string Campaign { get; set; } = "from_upgrade_dialog";
 
 
-    /// <summary>
-    /// Gets, sets the corner radius of the CTA panel. Zero (default) keeps the square, full-bleed
-    /// dialog section; a host embedding the control can round it into a card.
-    /// </summary>
-    public CornerRadius CtaCornerRadius
-    {
-        get => GetValue(CtaCornerRadiusProperty);
-        set => SetValue(CtaCornerRadiusProperty, value);
-    }
-    public static readonly StyledProperty<CornerRadius> CtaCornerRadiusProperty =
-        AvaloniaProperty.Register<UpgradeToProControl, CornerRadius>(nameof(CtaCornerRadius));
-
-
-    /// <summary>
-    /// Gets, sets whether the rule above the CTA panel is shown.
-    /// </summary>
-    public bool IsDividerVisible
-    {
-        get => GetValue(IsDividerVisibleProperty);
-        set => SetValue(IsDividerVisibleProperty, value);
-    }
-    public static readonly StyledProperty<bool> IsDividerVisibleProperty =
-        AvaloniaProperty.Register<UpgradeToProControl, bool>(nameof(IsDividerVisible), true);
-
-
-    /// <summary>
-    /// Gets, sets whether a successful import offers to restart the app. Quick Setup turns this
-    /// off: it restarts on Save, and restarting here would drop the steps already filled in.
-    /// </summary>
-    public bool PromptRestartAfterImport
-    {
-        get => GetValue(PromptRestartAfterImportProperty);
-        set => SetValue(PromptRestartAfterImportProperty, value);
-    }
-    public static readonly StyledProperty<bool> PromptRestartAfterImportProperty =
-        AvaloniaProperty.Register<UpgradeToProControl, bool>(nameof(PromptRestartAfterImport), true);
-
-
-    /// <summary>
-    /// Gets, sets a language pack to localize from instead of the app language. Quick Setup
-    /// previews a pack this way, so the wizard text follows the picker before anything is saved.
-    /// </summary>
-    public Lang? PreviewLang
-    {
-        get; set
-        {
-            field = value;
-            Localize();
-        }
-    }
-
-
-    private Lang CurrentLang => PreviewLang ?? Core.Lang;
-
-    // set once an import succeeded without a restart, so the button keeps naming that license
-    private string? _importedLicenseId;
-
-
     public UpgradeToProControl()
     {
         InitializeComponent();
 
         Localize();
 
-        PART_BtnViewFeatures.Click += (_, _) => OpenUrl("https://imageglass.org/pro");
-        PART_BtnBuyOnline.Click += (_, _) => OpenUrl("https://imageglass.org/pricing");
         PART_BtnRetrieveEmail.Click += (_, _) => OpenUrl("https://imageglass.org/pro/retrieve");
-        PART_BtnImportLicense.Click += async (_, _) => await ImportAndShowResultAsync();
+        PART_BtnImportLicense.Click += async (_, _) => await ImportLicenseAsync(this);
     }
 
 
@@ -120,17 +59,6 @@ public partial class UpgradeToProControl : PhControl
     }
 
 
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-
-        // the divider carried the gap above the CTA panel, so take it over when it's hidden
-        if (e.Property == IsDividerVisibleProperty && PART_Cta is not null)
-        {
-            PART_Cta.Margin = IsDividerVisible ? default : new Thickness(0, 20, 0, 0);
-        }
-    }
-
     #endregion // Overrides
 
 
@@ -138,19 +66,17 @@ public partial class UpgradeToProControl : PhControl
     #region Public methods
 
     /// <summary>
-    /// Pick a license file, verify its signature and install it. When <paramref name="promptRestart"/>
-    /// is set, also offers the restart that activates it. Returns the imported license, or
+    /// Pick a license file, verify its signature, install it, and offer to restart.
+    /// Returns the imported license, or
     /// <see langword="null"/> when nothing was installed.
     /// </summary>
-    public static async Task<LicenseInfo?> ImportLicenseAsync(Visual source, bool promptRestart = true)
+    public static async Task<LicenseInfo?> ImportLicenseAsync(Visual source)
     {
         var topLevel = TopLevel.GetTopLevel(source);
         if (topLevel is null) return null;
 
         var owner = topLevel as PhWindow;
-        var title = Core.Lang[Core.IsProEnabled
-            ? LangId.Menu_MnuManageLicense
-            : LangId.Menu_MnuUpgradeLicense];
+        var title = Core.Lang[LangId.Menu_MnuManageLicense];
 
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
@@ -190,9 +116,6 @@ public partial class UpgradeToProControl : PhControl
             return null;
         }
 
-        // the caller restarts on its own terms (Quick Setup saves first)
-        if (!promptRestart) return lic;
-
         // the license only loads at startup, so offer to restart now
         var result = await ModalWindow.ShowInfoAsync(owner, new ModalWindowOptions
         {
@@ -228,35 +151,15 @@ public partial class UpgradeToProControl : PhControl
     #region Methods
 
     /// <summary>
-    /// Imports a license, then reports the outcome on the button when no restart was offered.
-    /// </summary>
-    private async Task ImportAndShowResultAsync()
-    {
-        var lic = await ImportLicenseAsync(this, PromptRestartAfterImport);
-        if (lic is null || PromptRestartAfterImport) return;
-
-        // nothing else to do here: the license is installed and activates on the next launch
-        _importedLicenseId = lic.LicenseId;
-        PART_LblImportLicense.Text = _importedLicenseId;
-        PART_BtnImportLicense.IsEnabled = false;
-    }
-
-
-    /// <summary>
-    /// Applies every string from <see cref="CurrentLang"/>.
+    /// Applies every string from the current language pack.
     /// </summary>
     private void Localize()
     {
-        var lang = CurrentLang;
+        var lang = Core.Lang;
 
-        PART_LblDescription.Text = lang[LangId.Menu_MnuUpgradeLicense_Description];
-        PART_BtnViewFeatures.Text = lang[LangId.Menu_MnuUpgradeLicense_ViewFeatures];
-        PART_LblBuyOnline.Text = lang[LangId.Menu_MnuUpgradeLicense_BuyOnline];
         PART_LblRetrieveEmail.Text = lang[LangId.Menu_MnuUpgradeLicense_RetrieveFromEmail];
 
-        // an imported license names itself on the button, so it must survive a language switch
-        PART_LblImportLicense.Text = _importedLicenseId
-            ?? lang[LangId.Menu_MnuUpgradeLicense_ImportLicense];
+        PART_LblImportLicense.Text = lang[LangId.Menu_MnuUpgradeLicense_ImportLicense];
 
         // an authentic license the app cannot use: name the reason, lapsed first, over a pitch
         var expiredLic = Core.ExpiredLicense;
@@ -265,7 +168,6 @@ public partial class UpgradeToProControl : PhControl
 
         PART_LblExpired.IsVisible = isExpired;
         PART_LblOutOfScope.IsVisible = !isExpired && outOfScopeLic is not null;
-        PART_LblDescription.IsVisible = !isExpired && outOfScopeLic is null;
 
         if (expiredLic is not null)
         {

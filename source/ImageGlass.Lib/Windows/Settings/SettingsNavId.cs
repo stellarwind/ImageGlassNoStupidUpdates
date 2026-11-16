@@ -25,8 +25,7 @@ public enum SettingsNavId
 {
     General,
     Image,
-    Slideshow,
-    Edit,
+    Edit = 3,
     Layout,
     Viewer,
     Toolbar,
@@ -35,7 +34,6 @@ public enum SettingsNavId
     Keyboard,
     FileAssociations,
     Tools,
-    Plugins,
-    Language,
+    Language = 13,
     Appearance,
 }

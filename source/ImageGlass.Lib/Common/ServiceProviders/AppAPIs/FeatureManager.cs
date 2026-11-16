@@ -33,49 +33,21 @@ namespace ImageGlass.Common.ServiceProviders;
 internal static class FeatureManager
 {
     private static FrozenSet<string> _locked = FrozenSet<string>.Empty;
-    private static FrozenSet<LangId> _proGated = FrozenSet<LangId>.Empty;
     private static readonly Lock _lock = new();
 
-    // Menu features that require Pro; gated (badged) until a valid license is active.
-    private static readonly FrozenSet<LangId> _proFeatureKeys =
-        FrozenSet.ToFrozenSet(new[] { LangId.Menu_MnuHdrToneMapper });
-
-    // Gated features Classic can still open as a read-only preview.
-    private static readonly FrozenSet<LangId> _proPreviewKeys =
-        FrozenSet.ToFrozenSet(new[] { LangId.Menu_MnuHdrToneMapper });
-
-
     /// <summary>
-    /// Rebuilds the lock and Pro-gate snapshots from the current license + config.
+    /// Refreshes the admin feature locks from the current configuration.
     /// </summary>
     public static void Refresh()
     {
         // admin-only, already Pro-gated at capture
         var newLocked = Config.LockedFeatures;
 
-        // consumer Pro features stay gated until a license is active
-        var newProGated = Core.IsProEnabled ? FrozenSet<LangId>.Empty : _proFeatureKeys;
-
         lock (_lock)
         {
             _locked = newLocked;
-            _proGated = newProGated;
         }
     }
-
-
-    /// <summary>
-    /// Checks if a menu key is a Pro feature that is not yet unlocked.
-    /// </summary>
-    public static bool IsProGated(LangId? langKey)
-        => langKey is LangId key && _proGated.Contains(key);
-
-
-    /// <summary>
-    /// Checks if a menu key is a Pro feature Classic must not run at all: gated and not previewable.
-    /// </summary>
-    public static bool IsProBlocked(LangId? langKey)
-        => IsProGated(langKey) && !_proPreviewKeys.Contains(langKey!.Value);
 
 
     /// <summary>

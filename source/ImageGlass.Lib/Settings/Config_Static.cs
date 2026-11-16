@@ -291,15 +291,6 @@ public partial class Config
             ConfigBindingValue = "True",
             OnClick = new(LangId.Menu_MnuFullScreen, API.IG_ToggleFullScreen),
         },
-        // toggle slildeshow
-        new() {
-            Id = $"Btn_{nameof(IgThemeIcon.Slideshow)}",
-            Image = nameof(IgThemeIcon.Slideshow),
-            Text = Lang.KeysMap[LangId.Menu_MnuSlideshow],
-            ConfigBinding = nameof(Config.EnableSlideshow),
-            ConfigBindingValue = "True",
-            OnClick = new(LangId.Menu_MnuSlideshow, API.IG_ToggleSlideshow),
-        },
         ToolbarItemModel.Separator,
 
 
@@ -532,14 +523,6 @@ public partial class Config
             OnClick = new(LangId.Menu_MnuFullScreen, API.IG_ToggleFullScreen),
         },
         new() {
-            Id = $"Btn_{nameof(IgThemeIcon.Slideshow)}",
-            Image = nameof(IgThemeIcon.Slideshow),
-            Text = Lang.KeysMap[LangId.Menu_MnuSlideshow],
-            ConfigBinding = nameof(Config.EnableSlideshow),
-            ConfigBindingValue = "True",
-            OnClick = new(LangId.Menu_MnuSlideshow, API.IG_ToggleSlideshow),
-        },
-        new() {
             Id = $"Btn_{nameof(IgThemeIcon.Exit)}",
             Image = nameof(IgThemeIcon.Exit),
             Text = Lang.KeysMap[LangId.Menu_MnuExit],
@@ -604,8 +587,6 @@ public partial class Config
             // 8. migrate if config version changed
             appConfig = MigrateUserConfigFile(config);
 
-            // 9. apply persisted tool configs derived from the merged config
-            ApplyPersistedToolConfigs(appConfig);
         }
         catch (Exception ex)
         {
@@ -613,6 +594,13 @@ public partial class Config
         }
 
         appConfig ??= new();
+
+        // Toolbar layouts saved by earlier versions can still contain the slideshow button.
+        var toolbarButtons = appConfig.ToolbarButtons;
+        for (var i = toolbarButtons.Count - 1; i >= 0; i--)
+        {
+            if (toolbarButtons[i].Id == "Btn_Slideshow") toolbarButtons.RemoveAt(i);
+        }
 
         // seed pre-configured external tools; also runs on a failed load so they still work
         EnsurePredefinedTools(appConfig);
@@ -647,22 +635,6 @@ public partial class Config
         if (!PredefinedExternalTools.Seed(tools)) return;
 
         config.Tools = tools;
-    }
-
-
-    /// <summary>
-    /// Applies persisted tool configs that feed runtime state living outside <see cref="Config"/>.
-    /// Runs inside <see cref="Load"/> so the merged (default/user/CLI/admin) values are used and
-    /// applied even when the owning tool is never opened.
-    /// </summary>
-    private static void ApplyPersistedToolConfigs(Config config)
-    {
-        // HDR tone-mapping options -> Core.HdrToneMappingConfig (the source of truth the viewer reads)
-        if (config.ToolSettings.TryGetValue(HdrToneMapperToolControl.TOOL_ID, out var hdrEl))
-        {
-            var opts = hdrEl.Deserialize(HdrToneMappingOptionsJsonContext.Default.HdrToneMappingOptions);
-            if (opts is not null) Core.HdrToneMappingConfig = opts;
-        }
     }
 
 

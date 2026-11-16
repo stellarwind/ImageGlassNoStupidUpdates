@@ -163,7 +163,7 @@ public enum ImageInfoOverlayMode
     AlwaysAutoHide = 2,
 
     /// <summary>
-    /// Shown while the window has no title bar: frameless or full screen.
+    /// Shown in full screen, when the window has no title bar.
     /// </summary>
     Borderless = 3,
 

@@ -424,44 +424,10 @@ public partial class FileTypeAssociationsSettingsView : SettingsPageView
     }
 
 
-    /// <summary>
-    /// Builds a codec cell: a link button (opens the owning plugin on the Plugins page) for a plugin
-    /// codec, plain text for a built-in, and a muted placeholder when nothing handles it.
-    /// </summary>
-    private Control CodecCell(CodecInfo? codec)
-    {
-        var name = codec?.CodecName ?? string.Empty;
-        if (name.Length == 0)
-        {
-            // "–" here means nothing can handle it; the plugin dialog's dash means
-            // "capability not declared". Deliberately different, do not unify.
-            return PhTableControl.TextCell("–", muted: true);
-        }
-
-        // built-in codec -> plain text
-        var pluginId = codec?.PluginId;
-        if (string.IsNullOrEmpty(pluginId)) return PhTableControl.TextCell(name);
-
-        // plugin codec -> link that opens the plugin's info window on the Plugins page
-        var link = new PhButton
-        {
-            Text = name,
-            Variant = PhButtonVariant.Link,
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-        };
-        ToolTip.SetTip(link, name);
-        link.Click += (_, _) => OpenPluginSettings(pluginId);
-
-        return PhTableControl.WrapCell(link);
-    }
-
-
-    /// <summary>
-    /// Navigates to the Plugins page and highlights the plugin that owns the codec for the extension.
-    /// </summary>
-    private void OpenPluginSettings(string pluginId)
-        => this.FindAncestorOfType<SettingsWindowView>()?.NavigateToPlugin(pluginId);
+    private static Control CodecCell(CodecInfo? codec)
+        => string.IsNullOrEmpty(codec?.CodecName)
+            ? PhTableControl.TextCell("–", muted: true)
+            : PhTableControl.TextCell(codec.CodecName);
 
 
     /// <summary>

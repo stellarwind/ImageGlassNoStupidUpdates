@@ -125,13 +125,6 @@ public static class Core
 
 
     /// <summary>
-    /// Provides the slideshow service for managing slideshow playback.
-    /// </summary>
-    public static SlideshowProvider? Slideshow { get; set; } = null;
-
-
-
-    /// <summary>
     /// Singleton loader that owns every native plugin shared library for the process lifetime.
     /// Also exposes <see cref="PluginRegistry.FailureManager"/> for quarantine bookkeeping.
     /// </summary>
@@ -313,11 +306,6 @@ public static class Core
         CodecRegistry.Dispose();
 
         DisposeClipboardPhoto();
-
-        Core.Slideshow?.Dispose();
-        Core.Slideshow = null;
-
-        ProjectorToolControl.DisposeManager();
 
         Core.Photos.Dispose();
         Core.ColorProfileProvider?.Dispose();
@@ -819,17 +807,14 @@ public static class Core
 
 
     /// <summary>
-    /// Updates the viewer background resource according to app and slideshow settings.
+    /// Updates the viewer background resource according to the app settings.
     /// </summary>
     public static void UpdateViewerBackgroundBrushResource()
     {
         if (Application.Current is not App app) return;
 
         // 1. get background color from settings
-        var bgColorText = Config.EnableSlideshow
-            ? Config.SlideshowBackgroundColor
-            : Config.BackgroundColor;
-        var bgColor = BHelper.ColorFromHex(bgColorText, AccentColor);
+        var bgColor = BHelper.ColorFromHex(Config.BackgroundColor, AccentColor);
 
         // 2. use default background color from theme pack
         if (bgColor.IsEmpty)
@@ -851,11 +836,6 @@ public static class Core
         Resx.Set(ResxId.IG_ToolHostBackgroundBrush, toolHostBg.ToBrush());
 
 
-        // 5. a projector presents the photo to an audience, like a slideshow does
-        var projectorBg = BHelper.ColorFromHex(Config.SlideshowBackgroundColor, AccentColor);
-        if (projectorBg.IsEmpty) projectorBg = bgColor;
-
-        Resx.Set(ResxId.IG_ProjectorBackgroundBrush, projectorBg.ToBrush());
     }
 
 

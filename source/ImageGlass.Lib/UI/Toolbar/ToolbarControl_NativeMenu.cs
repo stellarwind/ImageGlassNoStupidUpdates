@@ -36,9 +36,7 @@ public partial class ToolbarControl
     private static readonly LangId[] _windowModeKeys =
     [
         LangId.Menu_MnuWindowFit,
-        LangId.Menu_MnuFrameless,
         LangId.Menu_MnuFullScreen,
-        LangId.Menu_MnuSlideshow,
     ];
 
     // maps each native menu item back to its source PhMenuItem so state can be re-synced on open

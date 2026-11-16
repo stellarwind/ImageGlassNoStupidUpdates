@@ -186,15 +186,6 @@
                                 TextAlignment="Center"
                                 TextTrimming="CharacterEllipsis" />
                         </ui:PhButton>
-                        <ui:PhButton
-                            x:Name="PART_BtnUpgradePlan"
-                            Width="300"
-                            HorizontalContentAlignment="Stretch">
-                            <ui:PhTextBlock
-                                LangKey="Menu_MnuManageLicense_UpgradePlan"
-                                TextAlignment="Center"
-                                TextTrimming="CharacterEllipsis" />
-                        </ui:PhButton>
                     </StackPanel>
                 </StackPanel>
             </Border>

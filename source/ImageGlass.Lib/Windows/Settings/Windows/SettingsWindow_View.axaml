@@ -124,7 +124,7 @@
                     FontWeight="SemiBold"
                     TextTrimming="CharacterEllipsis" />
 
-                <!--  Upgrade pitch or manage license, depending on the edition  -->
+                <!--  License management  -->
                 <ui:PhButton
                     x:Name="PART_License"
                     Grid.Column="1"

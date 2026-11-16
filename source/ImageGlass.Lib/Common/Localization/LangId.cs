@@ -167,15 +167,8 @@ public enum LangId
     _Credits,
     _Donate,
 
-    // slideshow
-    _PauseSlideshow,
-    _ResumeSlideshow,
-    _MnuPauseResumeSlideshow,
-    _MnuToggleCountdown,
-    _MnuExitSlideshow,
-
     // export frames
-    _Title,
+    _Title = 137,
     _FolderPickerTitle,
     _Exporting,
     _ExportDone,
@@ -306,15 +299,11 @@ public enum LangId
     Menu_MnuGoToFirst,
     Menu_MnuGoToLast,
 
-    Menu_MnuViewNextFrame,
-    Menu_MnuViewPreviousFrame,
-    Menu_MnuViewFirstFrame,
-    Menu_MnuViewLastFrame,
     #endregion // Main Menu > Navigation
 
 
     #region Main Menu > Zoom
-    Menu_MnuZoom,
+    Menu_MnuZoom = 231,
     Menu_MnuZoomIn,
     Menu_MnuZoomOut,
     Menu_MnuCustomZoom,
@@ -393,13 +382,10 @@ public enum LangId
 
     Menu_MnuWindowFit,
     Menu_MnuFullScreen,
-    Menu_MnuFrameless,
-    Menu_MnuFrameless_EnableDescription,
-    Menu_MnuSlideshow,
 
 
     #region Main Menu > Layout
-    Menu_MnuLayout,
+    Menu_MnuLayout = 290,
     Menu_MnuToggleToolbar,
     Menu_MnuToggleGallery,
     Menu_MnuToggleCheckerboard,
@@ -414,41 +400,26 @@ public enum LangId
     Menu_MnuColorPicker,
     Menu_MnuCropTool,
     Menu_MnuResizeTool,
-    Menu_MnuFrameNav,
-    Menu_MnuHdrToneMapper,
-    Menu_MnuProjector,
-    Menu_MnuToolsSettings,
+    Menu_MnuToolsSettings = 305,
 
-    Menu_MnuLosslessCompression,
-    Menu_MnuLosslessCompression_Confirm,
-    Menu_MnuLosslessCompression_Description,
-    Menu_MnuLosslessCompression_Compressing,
-    Menu_MnuLosslessCompression_Done,
-    Menu_MnuLosslessCompression_Error,
     #endregion // Main Menu > Tools
 
-    Menu_MnuPlugins,
-    Menu_MnuSettings,
+    Menu_MnuSettings = 313,
 
     #region Main Menu > Help
     Menu_MnuHelp,
     Menu_MnuAbout,
 
-    Menu_MnuUpgradeLicense,
-    Menu_MnuUpgradeLicense_Description,
-    Menu_MnuUpgradeLicense_ImportLicense,
+    Menu_MnuUpgradeLicense_ImportLicense = 318,
     Menu_MnuUpgradeLicense_RetrieveFromEmail,
-    Menu_MnuUpgradeLicense_BuyOnline,
-    Menu_MnuUpgradeLicense_ViewFeatures,
-    Menu_MnuUpgradeLicense_OutOfScope,
+    Menu_MnuUpgradeLicense_OutOfScope = 322,
     Menu_MnuUpgradeLicense_Expired,
     Menu_MnuUpgradeLicense_ExpiredTitle,
     Menu_MnuUpgradeLicense_SwitchToClassic,
 
     Menu_MnuManageLicense,
     Menu_MnuManageLicense_ChangeLicense,
-    Menu_MnuManageLicense_UpgradePlan,
-    Menu_MnuManageLicense_LicensedTo,
+    Menu_MnuManageLicense_LicensedTo = 329,
     Menu_MnuManageLicense_Plan,
     Menu_MnuManageLicense_Seats,
     Menu_MnuManageLicense_Expires,
@@ -464,8 +435,7 @@ public enum LangId
     Menu_MnuManageLicense_ExportSuccess,
     Menu_MnuManageLicense_ExportFailed,
 
-    Menu_MnuQuickSetup,
-    Menu_MnuReportIssue,
+    Menu_MnuReportIssue = 345,
 
     Menu_MnuSetDefaultPhotoViewer = 360,
     Menu_MnuSetDefaultPhotoViewer_Success,
@@ -495,8 +465,7 @@ public enum LangId
     #region Settings > Navbar
     Settings_Nav_General,
     Settings_Nav_Image,
-    Settings_Nav_Slideshow,
-    Settings_Nav_Edit,
+    Settings_Nav_Edit = 375,
     Settings_Nav_Viewer,
     Settings_Nav_Toolbar,
     Settings_Nav_Gallery,
@@ -505,8 +474,7 @@ public enum LangId
     Settings_Nav_Keyboard,
     Settings_Nav_FileTypeAssociations,
     Settings_Nav_Tools,
-    Settings_Nav_Plugins,
-    Settings_Nav_Language,
+    Settings_Nav_Language = 385,
     Settings_Nav_Appearance,
     #endregion // Settings > Navbar
 
@@ -576,29 +544,13 @@ public enum LangId
     #endregion // Settings > Tab Image
 
 
-    #region Settings > Tab Slideshow
-    // Slideshow > Appearance
-    Settings_Slideshow_Appearance,
-    Settings_EnableSlideshowCountdown,
-    Settings_EnableFullscreenSlideshow,
-
-    // Slideshow > Playback
-    Settings_Slideshow_Playback,
-    Settings_EnableLoopSlideshow,
-    Settings_EnableSlideshowRandomInterval,
-    Settings_SlideshowInterval,
-    Settings_SlideshowInterval_From,
-    Settings_SlideshowInterval_To,
-
-    Settings_SlideshowImagesToNotifySound,
-
-    // Slideshow > Transition (shared with Image > Browsing)
-    Settings_TransitionEffect,
+    #region Navigation transitions
+    Settings_TransitionEffect = 443,
     Settings_TransitionDuration,
     Settings_TransitionCompileError,
     Settings_OpenTransitionsFolder,
     Settings_GetMoreTransitionEffects,
-    #endregion // Settings > Tab Slideshow
+    #endregion // Navigation transitions
 
 
     #region Settings > Tab Edit
@@ -768,34 +720,12 @@ public enum LangId
 
 
     #region Settings > Tab Plugins
-    Settings_Plugins_OpenPluginFolder,
-    Settings_Plugins_GetMorePlugins,
-    Settings_Plugins_SupportedExtensions,
-    Settings_Plugins_ViewMetadata,
-    Settings_Plugins_FolderPath,
-    Settings_Plugins_InstallSuccess,
-    Settings_Plugins_DeleteConfirm,
-    Settings_Plugins_Status,
-    Settings_Plugins_Enable,
-    Settings_Plugins_TrustAndEnable,
-    Settings_Plugins_StatusEnabled,
-    Settings_Plugins_StatusDisabled,
-    Settings_Plugins_StatusUntrusted,
-    Settings_Plugins_StatusChanged,
-    Settings_Plugins_StatusNotLoaded,
-    Settings_Plugins_TrustTitle,
-    Settings_Plugins_TrustPrompt,
-    Settings_Plugins_TrustChangedWarning,
-    Settings_Plugins_EnableToLoad,
-    Settings_Plugins_ExtensionsHint,
-    Settings_Plugins_FormatsAfterEnable,
-    Settings_Plugins_NoFormats,
     #endregion // Settings > Tab Plugins
 
 
     #region Settings > Tab Language
     // Language > Language
-    Settings_DisplayLanguage,
+    Settings_DisplayLanguage = 568,
     Settings_Refresh,
     Settings_InstallNewLanguagePack,
     Settings_GetMoreLanguagePacks,
@@ -855,37 +785,10 @@ public enum LangId
     #endregion // Tool: Crop
 
 
-    #region Tool: HDR tone mapper
-    Tool_Hdr_LblMode,
-    Tool_Hdr_LblExposure,
-    Tool_Hdr_LblReferenceWhite,
-    Tool_Hdr_LblHighlightCompression,
-    Tool_Hdr_LblSaturation,
-    Tool_Hdr_BtnReset,
-    #endregion // Tool: HDR tone mapper
-
-
-    #region Tool: Projector
-    Tool_Projector_WindowTitle,
-    Tool_Projector_BtnAdd,
-    Tool_Projector_ChkSyncView,
-    Tool_Projector_ChkShowPointer,
-    Tool_Projector_ModeFullScreen,
-    Tool_Projector_ModeMaximized,
-    Tool_Projector_ModeNormal,
-    Tool_Projector_ModeTiled,
-    Tool_Projector_LblLayout,
-    Tool_Projector_Monitor,
-    Tool_Projector_DragHint,
-    Tool_Projector_ScreenInfo,
-    Tool_Projector_MainWindow,
-    #endregion // Tool: Projector
-
-
     #region Tool: Color picker
 
     // Color picker settings
-    Tool_ColorPicker_Title,
+    Tool_ColorPicker_Title = 624,
     Tool_ColorPicker_ChkShowRgbA,
     Tool_ColorPicker_ChkShowHexA,
     Tool_ColorPicker_ChkShowHslA,
@@ -953,24 +856,6 @@ public enum LangId
     #endregion // Print
 
 
-    #region Quick setup
-    QuickSetup_Title,
-    QuickSetup_StepInfo,
-    QuickSetup_SkipAndLaunch,
-
-    QuickSetup_SelectLanguage,
-    QuickSetup_SeeWhatNew,
-    QuickSetup_SelectProfile,
-    QuickSetup_StandardUser,
-    QuickSetup_ProfessionalUser,
-    QuickSetup_SettingsWillBeApplied,
-    QuickSetup_SettingProfileDescription,
-    QuickSetup_RegisterImageFormats,
-
-    QuickSetup_ConfirmCloseProcess,
-    QuickSetup_ConfirmCloseProcess_Description,
-    #endregion // Quick setup
-
-
+    Settings_ResetSettings_Confirm = 694,
+    Settings_ResetSettings_CloseOtherInstances,
 }
-

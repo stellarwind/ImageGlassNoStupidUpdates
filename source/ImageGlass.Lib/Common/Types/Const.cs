@@ -61,13 +61,6 @@ public static class Const
 
 
     /// <summary>
-    /// Quick setup version constant.
-    /// If the value read from config file is less than this value,
-    /// the Quick setup dialog will be opened.
-    /// </summary>
-    public const double QUICK_SETUP_VERSION = 10f;
-
-    /// <summary>
     /// The default theme pack (dark mode).
     /// </summary>
     public const string DEFAULT_THEME = "Kobe";

@@ -23,10 +23,6 @@ using System.Text.Json.Serialization;
 namespace ImageGlass.Common.Photoing;
 
 
-[JsonSerializable(typeof(HdrToneMappingOptions))]
-public partial class HdrToneMappingOptionsJsonContext : JsonSerializerContext { }
-
-
 /// <summary>
 /// Options for HDR-to-SDR tone mapping in <see cref="HdrToneMapper"/>.
 /// </summary>

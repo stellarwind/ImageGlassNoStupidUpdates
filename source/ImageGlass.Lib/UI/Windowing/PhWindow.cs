@@ -154,25 +154,14 @@ public partial class PhWindow : Window
 
 
 
-    /// <summary>
-    /// Gets, sets the frameless mode.
-    /// </summary>
-    public bool IsFrameless
-    {
-        get => GetValue(IsFramelessProperty);
-        set => SetValue(IsFramelessProperty, value);
-    }
-    public static readonly StyledProperty<bool> IsFramelessProperty =
-        AvaloniaProperty.Register<Window, bool>(nameof(IsFrameless), false);
-
-
     #endregion // Public Properties
 
 
 
     public PhWindow()
     {
-        OnIgFramelessModeChanged(IsFrameless);
+        Dispatcher.Post(() => OnIgTitleBarIconVisibilityChanged(ShowTitleBarIcon),
+            DispatcherPriority.Background);
         if (BackdropStyle == BackdropStyle.None)
         {
             UpdateBackground(true);
@@ -326,12 +315,6 @@ public partial class PhWindow : Window
             OnIgBackdropStyleChanged((BackdropStyle)e.NewValue!);
         }
 
-        // IsFrameless
-        else if (e.Property == IsFramelessProperty)
-        {
-            OnIgFramelessModeChanged((bool)e.NewValue!);
-        }
-
         // ShowTitleBarIcon
         else if (e.Property == ShowTitleBarIconProperty)
         {
@@ -383,19 +366,6 @@ public partial class PhWindow : Window
     }
 
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
-    {
-        base.OnPointerPressed(e);
-
-        // Frameless mode: enable window dragging at top border
-        if (IsFrameless)
-        {
-            var p = e.GetCurrentPoint(this);
-            if (p.Properties.IsLeftButtonPressed && p.Position.Y < 15) BeginMoveDrag(e);
-        }
-    }
-
-
     #endregion // Events & Override methods
 
 
@@ -419,29 +389,6 @@ public partial class PhWindow : Window
     /// </summary>
     protected virtual void OnIgCloseWindowHotkeyPressed(KeyEventArgs e) { }
 
-
-    /// <summary>
-    /// Occurs when the frameless mode is changed.
-    /// </summary>
-    protected virtual void OnIgFramelessModeChanged(bool enable)
-    {
-        if (enable)
-        {
-            ExtendClientAreaToDecorationsHint = true;
-            WindowDecorations = WindowDecorations.BorderOnly;
-        }
-        else
-        {
-            ExtendClientAreaToDecorationsHint = false;
-            WindowDecorations = WindowDecorations.Full;
-        }
-
-        // the restored title bar comes back without the app icon; re-assert it once the
-        // platform has rebuilt the frame
-        Dispatcher.Post(
-            () => OnIgTitleBarIconVisibilityChanged(ShowTitleBarIcon),
-            DispatcherPriority.Background);
-    }
 
 
     /// <summary>

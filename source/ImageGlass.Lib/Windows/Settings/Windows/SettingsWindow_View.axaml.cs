@@ -107,9 +107,8 @@ public partial class SettingsWindowView : PhControl
 
         if (PART_License is not null)
         {
-            PART_License.Text = "✦ " + Core.Lang[Core.IsProEnabled
-                ? LangId.Menu_MnuManageLicense
-                : LangId.Menu_MnuUpgradeLicense];
+            PART_License.IsVisible = Core.IsProEnabled || Core.ExpiredLicense is not null;
+            PART_License.Text = Core.Lang[LangId.Menu_MnuManageLicense];
         }
 
         // re-template the sidebar so the localized labels refresh
@@ -383,21 +382,6 @@ public partial class SettingsWindowView : PhControl
         if (item is null) return;
 
         PART_Sidebar.SelectedItem = item; // raises SelectionChanged -> ShowPage
-    }
-
-
-    /// <summary>
-    /// Navigates to the Plugins page and highlights the plugin with the given id (used by the File
-    /// type associations page's plugin-codec link).
-    /// </summary>
-    public void NavigateToPlugin(string pluginId)
-    {
-        NavigateTo(SettingsNavId.Plugins);
-
-        if (_pages.TryGetValue(SettingsNavId.Plugins, out var page) && page.Content is PluginsSettingsView view)
-        {
-            view.FocusPlugin(pluginId);
-        }
     }
 
 

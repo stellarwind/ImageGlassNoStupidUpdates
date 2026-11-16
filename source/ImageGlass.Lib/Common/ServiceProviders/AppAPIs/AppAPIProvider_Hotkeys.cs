@@ -79,10 +79,6 @@ public partial class AppAPIProvider
         new(LangId.Menu_MnuGoTo,                 API.IG_Goto,                Hotkey.Ctrl, Key.F),
         new(LangId.Menu_MnuGoToFirst,            API.IG_GotoFirst,           Key.Home),
         new(LangId.Menu_MnuGoToLast,             API.IG_GotoLast,            Key.End),
-        new(LangId.Menu_MnuViewNextFrame,        API.IG_ViewNextFrame,       Hotkey.Ctrl, Key.Right),
-        new(LangId.Menu_MnuViewPreviousFrame,    API.IG_ViewPreviousFrame,   Hotkey.Ctrl, Key.Left),
-        new(LangId.Menu_MnuViewFirstFrame,       API.IG_ViewFirstFrame,      Hotkey.Ctrl, Key.Up),
-        new(LangId.Menu_MnuViewLastFrame,        API.IG_ViewLastFrame,       Hotkey.Ctrl, Key.Down),
 
 
         // Zoom
@@ -150,12 +146,7 @@ public partial class AppAPIProvider
 
         // Window modes
         new(LangId.Menu_MnuWindowFit,           API.IG_ToggleWindowFit,             Key.F9),
-        .. SupportedOn(BHelper.OS != OSType.Linux, [
-            new(LangId.Menu_MnuFrameless,       API.IG_ToggleFrameless,             Key.F10),
-        ]),
         new(LangId.Menu_MnuFullScreen,          API.IG_ToggleFullScreen,            Key.F11),
-        new(LangId.Menu_MnuSlideshow,           API.IG_ToggleSlideshow,             Key.F12),
-        new(LangId._MnuPauseResumeSlideshow,    API.IG_ToggleSlideshowPlayback,     Key.Space),
 
 
         // Layout
@@ -169,25 +160,18 @@ public partial class AppAPIProvider
         // Tools
         new(LangId.Menu_MnuColorPicker,             API.IG_ToggleTool, ColorPickerToolControl.TOOL_ID,      [new(Key.K)]),
         new(LangId.Menu_MnuCropTool,                API.IG_ToggleTool, CropImageToolControl.TOOL_ID,        [new(Key.C)]),
-        new(LangId.Menu_MnuFrameNav,                API.IG_ToggleTool, FrameNavToolControl.TOOL_ID,         [new(Key.F)]),
-        new(LangId.Menu_MnuHdrToneMapper,           API.IG_ToggleTool, HdrToneMapperToolControl.TOOL_ID,    [new(Key.H)]),
-        new(LangId.Menu_MnuProjector,               API.IG_ToggleTool, ProjectorToolControl.TOOL_ID,        [new(Key.P)]),
         new(LangId.Menu_MnuResizeTool,              API.IG_OpenTool, ImageResizerTool.TOOL_ID,              [new(Key.R)]),
-        new(LangId.Menu_MnuLosslessCompression,     API.IG_OpenTool, LosslessCompressionTool.TOOL_ID,       [new(Key.M)]),
         new(LangId.Menu_MnuToolsSettings,           API.IG_OpenSettings, nameof(SettingsNavId.Tools)),
 
 
         // Settings
-        new(LangId.Menu_MnuPlugins,                 API.IG_OpenSettings, nameof(SettingsNavId.Plugins)),
         new(LangId.Menu_MnuSettings,                API.IG_OpenSettings,                                    Hotkey.Ctrl, Key.OemComma),
 
 
         // Help
         new(LangId.Menu_MnuAbout,                       API.IG_OpenAboutWindow, Key.F1),
-        new(LangId.Menu_MnuUpgradeLicense,              API.IG_ManageLicense),
         new(LangId.Menu_MnuManageLicense,               API.IG_ManageLicense),
         new(LangId.Menu_MnuReportIssue,                 API.IG_ReportIssue),
-        new(LangId.Menu_MnuQuickSetup,                  API.IG_QuickSetup),
         new(LangId.Menu_MnuSetDefaultPhotoViewer,       API.IG_SetDefaultPhotoViewer),
         new(LangId.Menu_MnuRemoveDefaultPhotoViewer,    API.IG_RemoveDefaultPhotoViewer),
 
@@ -345,13 +329,6 @@ public partial class AppAPIProvider
 
         // Check if the action is locked - silently ignore locked hotkeys
         if (FeatureManager.IsLocked(action.Executable))
-        {
-            e.Handled = true;
-            return;
-        }
-
-        // Pro feature gate
-        if (FeatureManager.IsProBlocked(Lang.GetKey(action.LangKey)))
         {
             e.Handled = true;
             return;

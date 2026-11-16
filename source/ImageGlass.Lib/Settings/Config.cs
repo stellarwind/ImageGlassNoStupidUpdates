@@ -134,61 +134,6 @@ public partial class Config : PhReactive
     }
 
     /// <summary>
-    /// Gets, sets value indicating whether the slideshow mode is enabled or not.
-    /// </summary>
-    [JsonIgnore]
-    public bool EnableSlideshow
-    {
-        get => Get(ConfigId.EnableSlideshow, false);
-        set => Set(ConfigId.EnableSlideshow, value);
-    }
-
-    /// <summary>
-    /// Gets, sets value if the countdown timer is shown or not.
-    /// </summary>
-    public bool EnableSlideshowCountdown
-    {
-        get => Get(ConfigId.EnableSlideshowCountdown, true);
-        set => Set(ConfigId.EnableSlideshowCountdown, value);
-    }
-
-    /// <summary>
-    /// Gets, sets value indicates whether the slide show interval is random.
-    /// </summary>
-    public bool EnableSlideshowRandomInterval
-    {
-        get => Get(ConfigId.EnableSlideshowRandomInterval, false);
-        set => Set(ConfigId.EnableSlideshowRandomInterval, value);
-    }
-
-    /// <summary>
-    /// Gets, sets value indicates that slideshow will loop back to the first image when reaching the end of list.
-    /// </summary>
-    public bool EnableLoopSlideshow
-    {
-        get => Get(ConfigId.EnableLoopSlideshow, true);
-        set => Set(ConfigId.EnableLoopSlideshow, value);
-    }
-
-    /// <summary>
-    /// Gets, sets value indicates that slideshow is played in full screen, not window mode.
-    /// </summary>
-    public bool EnableFullscreenSlideshow
-    {
-        get => Get(ConfigId.EnableFullscreenSlideshow, true);
-        set => Set(ConfigId.EnableFullscreenSlideshow, value);
-    }
-
-    /// <summary>
-    /// Gets, sets value of FrmMain's frameless mode.
-    /// </summary>
-    public bool EnableFrameless
-    {
-        get => Get(ConfigId.EnableFrameless, false);
-        set => Set(ConfigId.EnableFrameless, value);
-    }
-
-    /// <summary>
     /// Gets, sets value indicating whether the full screen mode is enabled or not.
     /// </summary>
     public bool EnableFullScreen
@@ -476,15 +421,6 @@ public partial class Config : PhReactive
     #region Number items
 
     /// <summary>
-    /// Gets, sets the version that requires to open Quick setup ImageGlass dialog.
-    /// </summary>
-    public double QuickSetupVersion
-    {
-        get => Get(ConfigId.QuickSetupVersion, 0d);
-        set => Set(ConfigId.QuickSetupVersion, value);
-    }
-
-    /// <summary>
     /// Gets, sets the maximum panning margin in screen pixels beyond the image edge.
     /// </summary>
     public double PanMargin
@@ -511,42 +447,6 @@ public partial class Config : PhReactive
     {
         get => Get(ConfigId.ZoomSpeed, 0d);
         set => Set(ConfigId.ZoomSpeed, value);
-    }
-
-    /// <summary>
-    /// Gets, sets slide show interval (minimum value if it's random)
-    /// </summary>
-    public double SlideshowInterval
-    {
-        get => Get(ConfigId.SlideshowInterval, 5d);
-        set => Set(ConfigId.SlideshowInterval, value);
-    }
-
-    /// <summary>
-    /// Gets, sets the maximum slide show interval value
-    /// </summary>
-    public double SlideshowIntervalTo
-    {
-        get => Get(ConfigId.SlideshowIntervalTo, 5d);
-        set => Set(ConfigId.SlideshowIntervalTo, value);
-    }
-
-    /// <summary>
-    /// Gets, sets the number of image changes to play a beep sound in slideshow mode.
-    /// </summary>
-    public uint SlideshowImagesToNotifySound
-    {
-        get => Get(ConfigId.SlideshowImagesToNotifySound, 0u);
-        set => Set(ConfigId.SlideshowImagesToNotifySound, value);
-    }
-
-    /// <summary>
-    /// Gets, sets the slideshow transition duration in milliseconds.
-    /// </summary>
-    public uint SlideshowTransitionDuration
-    {
-        get => Get(ConfigId.SlideshowTransitionDuration, 1000u);
-        set => Set(ConfigId.SlideshowTransitionDuration, value);
     }
 
     /// <summary>
@@ -728,24 +628,6 @@ public partial class Config : PhReactive
     {
         get => Get(ConfigId.BackgroundColor, "#00000000");
         set => Set(ConfigId.BackgroundColor, value);
-    }
-
-    /// <summary>
-    /// Gets, sets background color of slideshow
-    /// </summary>
-    public string SlideshowBackgroundColor
-    {
-        get => Get(ConfigId.SlideshowBackgroundColor, "#000000");
-        set => Set(ConfigId.SlideshowBackgroundColor, value);
-    }
-
-    /// <summary>
-    /// Gets, sets the transition effect id played when the slideshow advances.
-    /// </summary>
-    public string SlideshowTransition
-    {
-        get => Get(ConfigId.SlideshowTransition, TransitionEffects.NONE);
-        set => Set(ConfigId.SlideshowTransition, value);
     }
 
     /// <summary>
@@ -1060,16 +942,6 @@ public partial class Config : PhReactive
 
 
     #region Public Methods
-
-    /// <summary>
-    /// Resets all settings to their built-in defaults by clearing the stored values
-    /// (getters then fall back to their hardcoded defaults).
-    /// </summary>
-    public void ResetToDefault()
-    {
-        _values.Clear();
-    }
-
 
     /// <summary>
     /// Whether a value is stored for <paramref name="configName"/>. <c>false</c> means the getter

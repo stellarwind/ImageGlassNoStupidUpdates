@@ -49,15 +49,6 @@ public static class AppCmds
     public static string PHOTO_TRACE => "--ig-photo-trace";
 
     /// <summary>
-    /// Suppresses the forced startup Quick Setup for this launch.
-    /// </summary>
-    /// <remarks>
-    /// Example:
-    /// <code>ImageGlass.exe --ig-no-quick-setup</code>
-    /// </remarks>
-    public static string NO_QUICK_SETUP => "--ig-no-quick-setup";
-
-    /// <summary>
     /// Registers the app as the default photo viewer for the given extensions.
     /// </summary>
     /// <remarks>
@@ -81,7 +72,6 @@ public static class AppCmds
 
     //public static string SET_WALLPAPER => "--ig-set-wallpaper";
     //public static string SET_LOCK_SCREEN => "--ig-set-lock-screen";
-    //public static string START_SLIDESHOW => "--ig-start-slideshow";
     //public static string EXPORT_FRAMES => "--ig-export-frames";
     //public static string LOSSLESS_COMPRESS => "--ig-lossless-compress";
 
